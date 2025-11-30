@@ -1,0 +1,67 @@
+{
+  "categories": [
+    {
+      "id": "poles",
+      "name": "Poles",
+      "icon": "🪵",
+      "items": [
+        { "id": "wood-2", "name": "Wood Class 2", "icon": "🪵", "type": "pole", "props": { "class": "2", "material": "wood" } },
+        { "id": "wood-3", "name": "Wood Class 3", "icon": "🪵", "type": "pole", "props": { "class": "3", "material": "wood" } },
+        { "id": "wood-1", "name": "Wood Class 1", "icon": "🪵", "type": "pole", "props": { "class": "1", "material": "wood" } },
+        { "id": "wood-h1", "name": "Wood H1", "icon": "🪵", "type": "pole", "props": { "class": "H1", "material": "wood" } },
+        { "id": "steel-h1", "name": "Steel H1", "icon": "🗼", "type": "pole", "props": { "class": "H1", "material": "steel" } },
+        { "id": "steel-h2", "name": "Steel H2", "icon": "🗼", "type": "pole", "props": { "class": "H2", "material": "steel" } },
+        { "id": "concrete-2", "name": "Concrete Class 2", "icon": "🏛️", "type": "pole", "props": { "class": "2", "material": "concrete" } }
+      ]
+    },
+    {
+      "id": "conductors",
+      "name": "Conductors",
+      "icon": "⚡",
+      "items": [
+        { "id": "acsr-raven", "name": "ACSR Raven", "icon": "〰️", "type": "conductor", "props": { "code": "Raven", "size": "1/0", "weight": 0.367 } },
+        { "id": "acsr-sparrow", "name": "ACSR Sparrow", "icon": "〰️", "type": "conductor", "props": { "code": "Sparrow", "size": "#2", "weight": 0.291 } },
+        { "id": "acsr-penguin", "name": "ACSR Penguin", "icon": "〰️", "type": "conductor", "props": { "code": "Penguin", "size": "4/0", "weight": 0.563 } },
+        { "id": "acsr-dove", "name": "ACSR Dove", "icon": "〰️", "type": "conductor", "props": { "code": "Dove", "size": "556.5", "weight": 1.792 } },
+        { "id": "aac-tulip", "name": "AAC Tulip", "icon": "🔵", "type": "conductor", "props": { "code": "Tulip", "size": "#6", "weight": 0.146 } },
+        { "id": "aac-poppy", "name": "AAC Poppy", "icon": "🔵", "type": "conductor", "props": { "code": "Poppy", "size": "#4", "weight": 0.232 } }
+      ]
+    },
+    {
+      "id": "equipment",
+      "name": "Equipment",
+      "icon": "⚙️",
+      "items": [
+        { "id": "xfmr-10", "name": "Transformer 10kVA", "icon": "🔌", "type": "transformer", "props": { "kva": 10, "voltage": "7200/120-240" } },
+        { "id": "xfmr-25", "name": "Transformer 25kVA", "icon": "🔌", "type": "transformer", "props": { "kva": 25, "voltage": "7200/120-240" } },
+        { "id": "xfmr-50", "name": "Transformer 50kVA", "icon": "🔌", "type": "transformer", "props": { "kva": 50, "voltage": "7200/120-240" } },
+        { "id": "xfmr-100", "name": "Transformer 100kVA", "icon": "🔌", "type": "transformer", "props": { "kva": 100, "voltage": "7200/120-240" } },
+        { "id": "fuse", "name": "Fuse Cutout", "icon": "⚡", "type": "fuse", "props": { "rating": "100A" } },
+        { "id": "switch", "name": "Load Break Switch", "icon": "🔀", "type": "switch", "props": { "rating": "600A" } },
+        { "id": "recloser", "name": "Recloser", "icon": "🔄", "type": "recloser", "props": { "rating": "280A" } }
+      ]
+    },
+    {
+      "id": "guys",
+      "name": "Guy Wires",
+      "icon": "🔗",
+      "items": [
+        { "id": "guy-3-8", "name": "3/8\" EHS Guy", "icon": "↘️", "type": "guy", "props": { "size": "3/8", "strength": 10800 } },
+        { "id": "guy-7-16", "name": "7/16\" EHS Guy", "icon": "↘️", "type": "guy", "props": { "size": "7/16", "strength": 14500 } },
+        { "id": "guy-1-2", "name": "1/2\" EHS Guy", "icon": "↘️", "type": "guy", "props": { "size": "1/2", "strength": 18800 } },
+        { "id": "anchor-screw", "name": "Screw Anchor", "icon": "⚓", "type": "anchor", "props": { "capacity": 8000 } },
+        { "id": "anchor-plate", "name": "Plate Anchor", "icon": "⚓", "type": "anchor", "props": { "capacity": 12000 } }
+      ]
+    },
+    {
+      "id": "markers",
+      "name": "Markers",
+      "icon": "📍",
+      "items": [
+        { "id": "poi", "name": "Point of Interest", "icon": "📍", "type": "marker", "props": { "color": "red" } },
+        { "id": "road-crossing", "name": "Road Crossing", "icon": "🛣️", "type": "marker", "props": { "clearance": 18.5 } },
+        { "id": "river-crossing", "name": "River Crossing", "icon": "🌊", "type": "marker", "props": { "clearance": 25 } }
+      ]
+    }
+  ]
+}

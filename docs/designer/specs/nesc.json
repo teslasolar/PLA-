@@ -1,0 +1,81 @@
+{
+  "clearances": {
+    "ground": {
+      "description": "Minimum ground clearances (Rule 232)",
+      "voltages": {
+        "0-750": {
+          "roads": 18.5,
+          "pedestrian": 15.5,
+          "residential": 12.0,
+          "agricultural": 15.5,
+          "forest": 15.5
+        },
+        "750-22000": {
+          "roads": 18.5,
+          "pedestrian": 16.5,
+          "residential": 13.5,
+          "agricultural": 16.5,
+          "forest": 16.5
+        },
+        "22000-50000": {
+          "roads": 19.0,
+          "pedestrian": 17.0,
+          "residential": 14.0,
+          "agricultural": 17.0,
+          "forest": 17.0
+        }
+      },
+      "adder": {
+        "formula": "0.4 * ((voltage - 22000) / 1000)",
+        "applies": ">22kV"
+      }
+    },
+    "horizontal": {
+      "description": "Horizontal clearances from buildings (Rule 234)",
+      "voltages": {
+        "0-750": { "from_building": 3.0, "from_signs": 5.0 },
+        "750-22000": { "from_building": 4.5, "from_signs": 6.5 },
+        "22000-50000": { "from_building": 5.0, "from_signs": 7.0 }
+      }
+    },
+    "vertical_separation": {
+      "description": "Vertical separation between conductors (Rule 235)",
+      "same_owner": {
+        "0-8700": 12,
+        "8700-50000": 24
+      },
+      "different_owner": {
+        "0-8700": 16,
+        "8700-50000": 40
+      }
+    }
+  },
+  "loading": {
+    "districts": {
+      "heavy": { "ice": 0.5, "wind": 4, "temp": 0 },
+      "medium": { "ice": 0.25, "wind": 4, "temp": 15 },
+      "light": { "ice": 0, "wind": 9, "temp": 30 },
+      "warm_island": { "ice": 0, "wind": 9, "temp": 50 }
+    },
+    "overload_factors": {
+      "grade_b": {
+        "crossings": 2.50,
+        "else": 2.50
+      },
+      "grade_c": {
+        "crossings": 2.20,
+        "else": 2.20
+      },
+      "grade_n": {
+        "crossings": 1.00,
+        "else": 1.00
+      }
+    }
+  },
+  "units": {
+    "clearance": "ft",
+    "ice": "inches radial",
+    "wind": "psf",
+    "temp": "°F"
+  }
+}

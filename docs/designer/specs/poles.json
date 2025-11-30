@@ -1,0 +1,51 @@
+{
+  "classes": {
+    "H6": { "capacity": 19800, "heights": [75, 80, 85, 90], "groundLine": 8.5, "topDia": 7.5, "groundDia": 13.5 },
+    "H5": { "capacity": 16000, "heights": [70, 75, 80, 85], "groundLine": 8.0, "topDia": 7.0, "groundDia": 12.5 },
+    "H4": { "capacity": 12400, "heights": [65, 70, 75, 80], "groundLine": 7.5, "topDia": 6.5, "groundDia": 11.5 },
+    "H3": { "capacity": 10000, "heights": [60, 65, 70, 75], "groundLine": 7.0, "topDia": 6.0, "groundDia": 10.5 },
+    "H2": { "capacity": 8000, "heights": [55, 60, 65, 70], "groundLine": 6.5, "topDia": 5.5, "groundDia": 9.5 },
+    "H1": { "capacity": 6400, "heights": [55, 60, 65], "groundLine": 6.5, "topDia": 5.0, "groundDia": 9.0 },
+    "1": { "capacity": 4500, "heights": [40, 45, 50, 55], "groundLine": 6.0, "topDia": 4.5, "groundDia": 8.0 },
+    "2": { "capacity": 3700, "heights": [35, 40, 45, 50], "groundLine": 5.5, "topDia": 4.0, "groundDia": 7.5 },
+    "3": { "capacity": 3000, "heights": [30, 35, 40, 45], "groundLine": 5.0, "topDia": 3.5, "groundDia": 7.0 },
+    "4": { "capacity": 2400, "heights": [30, 35, 40], "groundLine": 5.0, "topDia": 3.0, "groundDia": 6.5 },
+    "5": { "capacity": 1900, "heights": [25, 30, 35], "groundLine": 4.5, "topDia": 2.5, "groundDia": 6.0 },
+    "6": { "capacity": 1500, "heights": [25, 30], "groundLine": 4.5, "topDia": 2.0, "groundDia": 5.5 },
+    "7": { "capacity": 1200, "heights": [20, 25], "groundLine": 4.0, "topDia": 1.5, "groundDia": 5.0 }
+  },
+  "materials": {
+    "wood": {
+      "species": ["Southern Pine", "Douglas Fir", "Western Red Cedar"],
+      "treatment": ["CCA", "Penta", "Creosote"],
+      "color": "#8B4513",
+      "roughness": 0.9,
+      "metalness": 0.1
+    },
+    "steel": {
+      "grades": ["ASTM A572 Grade 65", "ASTM A871"],
+      "finish": ["Galvanized", "Weathering"],
+      "color": "#C0C0C0",
+      "roughness": 0.3,
+      "metalness": 0.7
+    },
+    "concrete": {
+      "types": ["Spun", "Static Cast"],
+      "reinforcement": ["Prestressed", "Conventional"],
+      "color": "#808080",
+      "roughness": 0.8,
+      "metalness": 0.1
+    },
+    "composite": {
+      "types": ["FRP", "GFRP"],
+      "color": "#A0A0A0",
+      "roughness": 0.6,
+      "metalness": 0.2
+    }
+  },
+  "settingDepth": {
+    "formula": "length * 0.1 + 2",
+    "minimum": 5,
+    "maximum": 10
+  }
+}

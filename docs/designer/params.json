@@ -1,0 +1,44 @@
+{
+  "canvas": {
+    "width": 1000,
+    "height": 600,
+    "gridSize": 20,
+    "snapEnabled": true,
+    "snapSize": 5
+  },
+  "scene3d": {
+    "background": "#87CEEB",
+    "fogNear": 200,
+    "fogFar": 1000,
+    "groundSize": 1000,
+    "groundColor": "#228B22",
+    "gridDivisions": 50
+  },
+  "camera": {
+    "fov": 60,
+    "near": 0.1,
+    "far": 2000,
+    "position": [150, 80, 150],
+    "target": [0, 15, 0]
+  },
+  "lighting": {
+    "ambient": { "color": "#404040", "intensity": 1 },
+    "directional": { "color": "#ffffff", "intensity": 1.5, "position": [100, 150, 100] },
+    "hemisphere": { "skyColor": "#87CEEB", "groundColor": "#8B7355", "intensity": 0.5 }
+  },
+  "defaults": {
+    "poleClass": "2",
+    "poleMaterial": "wood",
+    "conductorCode": "Raven",
+    "phases": 3,
+    "sag": 2.5,
+    "windPressure": 4,
+    "safetyFactor": 2.2
+  },
+  "units": {
+    "length": "ft",
+    "force": "lb",
+    "moment": "lb-ft",
+    "pressure": "psf"
+  }
+}

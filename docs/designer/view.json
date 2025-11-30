@@ -1,0 +1,49 @@
+{
+  "name": "PLA Designer",
+  "version": "1.0.0",
+  "type": "coordinate",
+  "meta": {
+    "author": "PLA System",
+    "description": "Drag-and-drop pole line design with 3D visualization",
+    "created": "2024-01-01",
+    "tags": ["designer", "3d", "poles", "analysis"]
+  },
+  "root": {
+    "type": "container.flex",
+    "props": {
+      "direction": "row",
+      "style": {
+        "width": "100vw",
+        "height": "100vh"
+      }
+    },
+    "children": [
+      { "ref": "sidebar" },
+      { "ref": "main-area" },
+      { "ref": "properties" }
+    ]
+  },
+  "components": {
+    "sidebar": {
+      "type": "container.flex",
+      "props": { "direction": "column", "width": 280 },
+      "children": ["search", "palette"]
+    },
+    "main-area": {
+      "type": "container.flex",
+      "props": { "direction": "column", "flex": 1 },
+      "children": ["toolbar", "canvas", "statusbar"]
+    },
+    "properties": {
+      "type": "container.flex",
+      "props": { "direction": "column", "width": 320 },
+      "children": ["props-panel", "analysis-panel", "json-panel"]
+    }
+  },
+  "bindings": {
+    "poleCount": "state.poles.length",
+    "spanCount": "state.spans.length",
+    "selected": "state.selected",
+    "tool": "state.tool"
+  }
+}
