@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA - {{TITLE}}</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+</head>
+<body>
+    <nav class="topnav">
+        <a href="../" class="logo">🔌 PLA</a>
+        <div class="nav-links">
+            <a href="./">App</a>
+            <a href="core/">Core</a>
+            <a href="viz/">Viz</a>
+            <a href="analysis/">Analysis</a>
+            <a href="sandbox/">Sandbox</a>
+            <a href="docs/">Docs</a>
+        </div>
+    </nav>
+    <main id="app">{{CONTENT}}</main>
+    <script type="module">
+        // Dynamic module loading
+        import { PLA } from './core/init.js';
+        window.PLA = await PLA.init();
+    </script>
+</body>
+</html>

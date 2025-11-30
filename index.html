@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA - Pole Line Analysis</title>
+    <style>
+        :root { --p: #2563eb; --d: #1f2937; --l: #f3f4f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: var(--d); color: #fff; min-height: 100vh; }
+        .hero { text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, #1e3a5f, #0f172a); }
+        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .subtitle { opacity: 0.8; font-size: 1.25rem; margin-bottom: 2rem; }
+        .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: -2rem auto 2rem; padding: 0 2rem; }
+        .nav-card { background: #1e293b; border-radius: 12px; padding: 2rem; text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s; }
+        .nav-card:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .nav-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .nav-card p { opacity: 0.7; font-size: 0.9rem; }
+        .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-val { font-size: 2rem; font-weight: bold; color: #60a5fa; }
+        .stat-lbl { font-size: 0.8rem; opacity: 0.6; }
+        footer { text-align: center; padding: 2rem; opacity: 0.5; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🔌 PLA System</h1>
+        <p class="subtitle">Pole Line Analysis | 3D Engineering | CPU+GPU Compute</p>
+        <div class="stats">
+            <div class="stat"><div class="stat-val">WebGPU</div><div class="stat-lbl">GPU Compute</div></div>
+            <div class="stat"><div class="stat-val">16-dim</div><div class="stat-lbl">FemtoLLM</div></div>
+            <div class="stat"><div class="stat-val">1000³</div><div class="stat-lbl">Block Array</div></div>
+            <div class="stat"><div class="stat-val">3D</div><div class="stat-lbl">Visualization</div></div>
+        </div>
+    </div>
+    <nav class="nav-grid">
+        <a href="docs/" class="nav-card">
+            <h2>📱 Application</h2>
+            <p>Launch the full PLA system with 3D viewer, analysis tools, and AI assistant</p>
+        </a>
+        <a href="docs/sandbox/" class="nav-card">
+            <h2>🐍 Python Sandbox</h2>
+            <p>Run Python calculations in browser with NumPy via Pyodide</p>
+        </a>
+        <a href="docs/core/" class="nav-card">
+            <h2>⚡ Core Modules</h2>
+            <p>eVGPU, WebGPU, FemtoLLM, BlockArray, and compute engines</p>
+        </a>
+        <a href="docs/viz/" class="nav-card">
+            <h2>🎨 Visualization</h2>
+            <p>Three.js 3D rendering for poles, conductors, and infrastructure</p>
+        </a>
+        <a href="docs/analysis/" class="nav-card">
+            <h2>📐 Analysis</h2>
+            <p>Catenary, pole loading, clearance, and structural calculations</p>
+        </a>
+        <a href="docs/docs/" class="nav-card">
+            <h2>📚 Documentation</h2>
+            <p>API reference, examples, and NESC/engineering standards</p>
+        </a>
+    </nav>
+    <footer>PLA System v1.0 | No Server Required | Runs on GitHub Pages</footer>
+</body>
+</html>
