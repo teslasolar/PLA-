@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA Python Sandbox</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #4fc3f7;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .status.loading {
+            background: #ff9800;
+            color: #000;
+        }
+
+        .status.ready {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            background: #16213e;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #0f3460;
+        }
+
+        .panel-header h3 {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .panel-header button {
+            padding: 6px 16px;
+            background: #4fc3f7;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .panel-header button:hover {
+            background: #81d4fa;
+        }
+
+        .panel-header button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            padding: 16px;
+            background: #0d1117;
+            color: #c9d1d9;
+            border: none;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        #output {
+            flex: 1;
+            padding: 16px;
+            background: #0d1117;
+            color: #58a6ff;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        .output-error {
+            color: #f85149;
+        }
+
+        .examples {
+            margin-top: 20px;
+        }
+
+        .examples h3 {
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 8px 16px;
+            background: #0f3460;
+            color: #eee;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            background: #16213e;
+            border-color: #4fc3f7;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐍 PLA Python Sandbox</h1>
+            <span id="status" class="status loading">Loading Pyodide...</span>
+        </header>
+
+        <div class="editor-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Python Code</h3>
+                    <button id="runBtn" onclick="runCode()" disabled>▶ Run</button>
+                </div>
+                <textarea id="editor">import numpy as np
+
+# PLA Catenary Curve Calculator
+class CatenaryCurve:
+    def __init__(self, span, sag, weight=1.5):
+        """
+        Initialize catenary curve
+        span: horizontal distance (m)
+        sag: maximum vertical sag (m)
+        weight: conductor weight (kg/m)
+        """
+        self.span = span
+        self.sag = sag
+        self.weight = weight
+        self.a = self._calculate_catenary_constant()
+
+    def _calculate_catenary_constant(self):
+        # Iterative solution for catenary constant
+        return self.span / (2 * np.arcsinh(self.sag * 2 / self.span))
+
+    def get_y(self, x):
+        """Get vertical position at horizontal position x"""
+        local_x = x - self.span / 2
+        return self.a * np.cosh(local_x / self.a) - self.a * np.cosh(self.span / (2 * self.a))
+
+    def get_tension(self):
+        """Get horizontal tension (N)"""
+        return self.a * self.weight * 9.81
+
+    def get_max_tension(self):
+        """Get maximum tension at supports (N)"""
+        H = self.get_tension()
+        V = self.weight * 9.81 * self.a * np.sinh(self.span / (2 * self.a))
+        return np.sqrt(H**2 + V**2)
+
+    def get_length(self):
+        """Get conductor arc length (m)"""
+        return 2 * self.a * np.sinh(self.span / (2 * self.a))
+
+# Example usage
+print("=" * 50)
+print("PLA Catenary Analysis")
+print("=" * 50)
+
+# Create catenary with 50m span, 2.5m sag
+catenary = CatenaryCurve(span=50, sag=2.5, weight=1.5)
+
+print(f"\nParameters:")
+print(f"  Span: {catenary.span} m")
+print(f"  Sag: {catenary.sag} m")
+print(f"  Weight: {catenary.weight} kg/m")
+print(f"  Catenary constant (a): {catenary.a:.4f} m")
+
+print(f"\nResults:")
+print(f"  Horizontal Tension: {catenary.get_tension():.2f} N")
+print(f"  Maximum Tension: {catenary.get_max_tension():.2f} N")
+print(f"  Conductor Length: {catenary.get_length():.2f} m")
+print(f"  Length increase: {(catenary.get_length() - catenary.span):.4f} m")
+
+# Calculate points
+print(f"\nCatenary Points:")
+for x in np.linspace(0, 50, 6):
+    y = catenary.get_y(x)
+    print(f"  x={x:5.1f}m, y={y:7.4f}m")
+</textarea>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Output</h3>
+                    <button onclick="clearOutput()">Clear</button>
+                </div>
+                <pre id="output">Initializing Python environment...
+This may take a few seconds on first load.</pre>
+            </div>
+        </div>
+
+        <div class="examples">
+            <h3>Examples</h3>
+            <div class="example-buttons">
+                <button class="example-btn" onclick="loadExample('catenary')">Catenary Analysis</button>
+                <button class="example-btn" onclick="loadExample('wind')">Wind Load</button>
+                <button class="example-btn" onclick="loadExample('pole')">Pole Loading</button>
+                <button class="example-btn" onclick="loadExample('ruling')">Ruling Span</button>
+                <button class="example-btn" onclick="loadExample('clearance')">Clearance Check</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pyodide = null;
+
+        const EXAMPLES = {
+            catenary: `import numpy as np
+
+# Catenary curve analysis
+span = 60  # meters
+sag = 3.0  # meters
+weight = 1.8  # kg/m (ACSR conductor)
+
+# Calculate catenary constant
+a = span / (2 * np.arcsinh(sag * 2 / span))
+
+# Horizontal tension
+H = a * weight * 9.81
+
+# Conductor length
+L = 2 * a * np.sinh(span / (2 * a))
+
+print("Catenary Analysis Results")
+print("=" * 40)
+print(f"Span: {span} m")
+print(f"Sag: {sag} m")
+print(f"Conductor weight: {weight} kg/m")
+print(f"")
+print(f"Catenary constant (a): {a:.4f} m")
+print(f"Horizontal tension: {H:.2f} N ({H/1000:.2f} kN)")
+print(f"Conductor length: {L:.4f} m")
+print(f"Extra length: {L - span:.4f} m ({(L/span - 1)*100:.2f}%)")`,
+
+            wind: `import numpy as np
+
+# Wind load calculations
+def wind_pressure(velocity_ms):
+    """Calculate wind pressure from velocity (m/s to Pa)"""
+    rho = 1.225  # air density kg/m³
+    return 0.5 * rho * velocity_ms**2
+
+def wind_force_on_conductor(velocity, diameter_mm, span_m):
+    """Calculate wind force on conductor"""
+    q = wind_pressure(velocity)
+    Cd = 1.0  # drag coefficient for cylinder
+    force_per_m = Cd * q * (diameter_mm / 1000)
+    return force_per_m * span_m
+
+# Example calculation
+wind_speed = 25  # m/s
+conductor_dia = 25.4  # mm (1 inch)
+span = 50  # m
+
+pressure = wind_pressure(wind_speed)
+force = wind_force_on_conductor(wind_speed, conductor_dia, span)
+
+print("Wind Load Analysis")
+print("=" * 40)
+print(f"Wind speed: {wind_speed} m/s ({wind_speed * 2.237:.1f} mph)")
+print(f"Conductor diameter: {conductor_dia} mm")
+print(f"Span length: {span} m")
+print(f"")
+print(f"Wind pressure: {pressure:.2f} Pa ({pressure * 0.02089:.2f} psf)")
+print(f"Force per meter: {force/span:.2f} N/m")
+print(f"Total wind force: {force:.2f} N")
+print(f"")
+print("Ice-covered conductor:")
+ice_thickness = 12.7  # mm (0.5 inch)
+effective_dia = conductor_dia + 2 * ice_thickness
+force_iced = wind_force_on_conductor(wind_speed, effective_dia, span)
+print(f"Ice thickness: {ice_thickness} mm")
+print(f"Effective diameter: {effective_dia} mm")
+print(f"Force on iced conductor: {force_iced:.2f} N")`,
+
+            pole: `import numpy as np
+
+# Pole structural analysis
+class PoleAnalysis:
+    POLE_CLASSES = {
+        'H1': {'moment': 6400, 'top_circ': 23},
+        'H2': {'moment': 8000, 'top_circ': 25},
+        '1': {'moment': 4500, 'top_circ': 21},
+        '2': {'moment': 3700, 'top_circ': 19.5},
+        '3': {'moment': 3000, 'top_circ': 18},
+    }
+
+    def __init__(self, pole_class, height_ft):
+        self.pole_class = pole_class
+        self.height = height_ft
+        self.embed = max(6, height_ft * 0.1 + 2)
+        self.height_above_ground = height_ft - self.embed
+        self.loads = []
+
+    def add_conductor_load(self, force, height):
+        self.loads.append({'force': force, 'height': height})
+
+    def calculate_moment(self):
+        return sum(l['force'] * l['height'] for l in self.loads)
+
+    def get_capacity(self):
+        return self.POLE_CLASSES.get(self.pole_class, {}).get('moment', 0)
+
+    def get_utilization(self, overload_factor=2.5):
+        moment = self.calculate_moment()
+        capacity = self.get_capacity()
+        return (moment * overload_factor / capacity) * 100 if capacity else 0
+
+# Example
+pole = PoleAnalysis('2', 45)
+pole.add_conductor_load(200, 40)  # Phase 1
+pole.add_conductor_load(200, 38)  # Phase 2
+pole.add_conductor_load(200, 36)  # Phase 3
+pole.add_conductor_load(50, 42)   # Neutral
+pole.add_conductor_load(100, 20)  # Wind on pole
+
+print("Pole Structural Analysis")
+print("=" * 40)
+print(f"Pole Class: {pole.pole_class}")
+print(f"Total Height: {pole.height} ft")
+print(f"Setting Depth: {pole.embed:.1f} ft")
+print(f"Height Above Ground: {pole.height_above_ground:.1f} ft")
+print(f"")
+print("Applied Loads:")
+for i, load in enumerate(pole.loads):
+    print(f"  Load {i+1}: {load['force']} lb @ {load['height']} ft")
+print(f"")
+print(f"Ground-Line Moment: {pole.calculate_moment()} lb-ft")
+print(f"Pole Capacity: {pole.get_capacity()} lb-ft")
+print(f"Utilization (Grade C): {pole.get_utilization():.1f}%")
+print(f"Status: {'PASS' if pole.get_utilization() <= 100 else 'FAIL'}")`,
+
+            ruling: `import numpy as np
+
+# Ruling Span Calculation
+def ruling_span(spans):
+    """
+    Calculate ruling span for a series of spans
+    Rs = sqrt(sum(Li^3) / sum(Li))
+    """
+    sum_cubes = sum(s**3 for s in spans)
+    sum_lengths = sum(spans)
+    return np.sqrt(sum_cubes / sum_lengths)
+
+def ruling_span_estimate(spans):
+    """
+    Quick estimate: Se = Avg + (2/3)(Max - Avg)
+    """
+    avg = np.mean(spans)
+    max_span = max(spans)
+    return avg + (2/3) * (max_span - avg)
+
+# Example line section
+spans = [250, 300, 275, 350, 280, 265, 310, 290]
+
+print("Ruling Span Analysis")
+print("=" * 40)
+print(f"Number of spans: {len(spans)}")
+print(f"Span lengths (ft): {spans}")
+print(f"")
+print(f"Statistics:")
+print(f"  Minimum span: {min(spans)} ft")
+print(f"  Maximum span: {max(spans)} ft")
+print(f"  Average span: {np.mean(spans):.1f} ft")
+print(f"  Std deviation: {np.std(spans):.1f} ft")
+print(f"")
+print(f"Ruling Span:")
+print(f"  Exact formula: {ruling_span(spans):.1f} ft")
+print(f"  Quick estimate: {ruling_span_estimate(spans):.1f} ft")
+print(f"")
+print("Note: All spans in section should be strung")
+print("at tension calculated for the ruling span.")`,
+
+            clearance: `import numpy as np
+
+# Clearance analysis
+class ClearanceChecker:
+    # NESC Table 232-1 minimum clearances (ft)
+    CLEARANCES = {
+        'road': 18.5,
+        'residential': 15.5,
+        'pedestrian': 15.5,
+        'farm': 18.5,
+        'water': 17.0,
+        'railroad': 27.0,
+    }
+
+    def __init__(self, conductor_height, max_sag):
+        self.conductor_height = conductor_height
+        self.max_sag = max_sag
+
+    def min_height_at_midspan(self):
+        return self.conductor_height - self.max_sag
+
+    def check_clearance(self, terrain_type, ground_elevation=0):
+        required = self.CLEARANCES.get(terrain_type, 15.5)
+        actual = self.min_height_at_midspan() - ground_elevation
+        return {
+            'terrain': terrain_type,
+            'required': required,
+            'actual': actual,
+            'margin': actual - required,
+            'status': 'PASS' if actual >= required else 'FAIL'
+        }
+
+# Example
+attachment_height = 35  # ft
+max_sag = 8  # ft at maximum temperature
+
+checker = ClearanceChecker(attachment_height, max_sag)
+
+print("Clearance Analysis")
+print("=" * 40)
+print(f"Conductor attachment height: {attachment_height} ft")
+print(f"Maximum sag: {max_sag} ft")
+print(f"Minimum conductor height: {checker.min_height_at_midspan()} ft")
+print(f"")
+print("Clearance Checks:")
+print("-" * 40)
+
+for terrain in ['road', 'residential', 'pedestrian', 'railroad']:
+    result = checker.check_clearance(terrain)
+    status = '✓' if result['status'] == 'PASS' else '✗'
+    print(f"{terrain.capitalize():12} Required: {result['required']:5.1f} ft")
+    print(f"{'':12} Actual:   {result['actual']:5.1f} ft")
+    print(f"{'':12} Margin:   {result['margin']:+5.1f} ft  {status}")
+    print()
+
+# Check with elevated ground
+print("With 5 ft elevated crossing:")
+result = checker.check_clearance('road', ground_elevation=5)
+print(f"Clearance: {result['actual']:.1f} ft - {result['status']}")`
+        };
+
+        async function initPyodide() {
+            const statusEl = document.getElementById('status');
+            const runBtn = document.getElementById('runBtn');
+
+            try {
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/"
+                });
+
+                await pyodide.loadPackage(['numpy']);
+
+                statusEl.textContent = 'Ready';
+                statusEl.classList.remove('loading');
+                statusEl.classList.add('ready');
+                runBtn.disabled = false;
+
+                document.getElementById('output').textContent = 'Python environment ready!\nClick "Run" to execute code.';
+
+            } catch (error) {
+                statusEl.textContent = 'Error';
+                document.getElementById('output').textContent = `Failed to load Pyodide: ${error.message}`;
+            }
+        }
+
+        async function runCode() {
+            if (!pyodide) {
+                document.getElementById('output').textContent = 'Python not ready yet...';
+                return;
+            }
+
+            const code = document.getElementById('editor').value;
+            const output = document.getElementById('output');
+
+            output.textContent = 'Running...\n';
+            output.classList.remove('output-error');
+
+            try {
+                pyodide.runPython(`
+                    import sys
+                    from io import StringIO
+                    sys.stdout = StringIO()
+                    sys.stderr = StringIO()
+                `);
+
+                await pyodide.runPythonAsync(code);
+
+                const stdout = pyodide.runPython('sys.stdout.getvalue()');
+                const stderr = pyodide.runPython('sys.stderr.getvalue()');
+
+                if (stderr) {
+                    output.textContent = stderr;
+                    output.classList.add('output-error');
+                } else {
+                    output.textContent = stdout || '(No output)';
+                }
+
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+                output.classList.add('output-error');
+            }
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+            document.getElementById('output').classList.remove('output-error');
+        }
+
+        function loadExample(name) {
+            if (EXAMPLES[name]) {
+                document.getElementById('editor').value = EXAMPLES[name];
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initPyodide);
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                runCode();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+title: PLA - Pole Line Analysis
+description: 3D Power Line Analysis System with CPU-based AI
+baseurl: ""
+url: ""
+theme: null
+
+# GitHub Pages configuration
+remote_theme: pages-themes/minimal@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections for documentation
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name
+  examples:
+    output: true
+    permalink: /:collection/:name
+  specs:
+    output: true
+    permalink: /:collection/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+
+# Build settings
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Custom variables
+pla_version: "1.0.0"
+femto_llm_dim: 16
+block_array_size: 1000

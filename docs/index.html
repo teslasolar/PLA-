@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA - Pole Line Analysis System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="logo">🔌 PLA System</div>
+        <ul>
+            <li><a href="#viewer">3D Viewer</a></li>
+            <li><a href="#analysis">Analysis</a></li>
+            <li><a href="#sandbox">Sandbox</a></li>
+            <li><a href="docs/">Documentation</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Pole Line Analysis</h1>
+        <p>3D Power Line Engineering with CPU-based AI</p>
+        <div class="stats">
+            <div class="stat">
+                <span class="value">1000³</span>
+                <span class="label">Block Array</span>
+            </div>
+            <div class="stat">
+                <span class="value">16-dim</span>
+                <span class="label">FemtoLLM</span>
+            </div>
+            <div class="stat">
+                <span class="value">0</span>
+                <span class="label">GPU Required</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- 3D Viewer Section -->
+        <section id="viewer" class="section">
+            <h2>Interactive 3D Viewer</h2>
+            <div id="threejs-container"></div>
+            <div class="controls">
+                <button onclick="PLA.resetCamera()">Reset View</button>
+                <button onclick="PLA.toggleWireframe()">Wireframe</button>
+                <button onclick="PLA.addPole()">Add Pole</button>
+                <button onclick="PLA.runAnalysis()">Analyze</button>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section id="analysis" class="section">
+            <h2>Pole Analysis</h2>
+            <div class="analysis-grid">
+                <div class="panel">
+                    <h3>Sag-Tension Calculator</h3>
+                    <div class="form-group">
+                        <label>Span (m):</label>
+                        <input type="number" id="span" value="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Sag (m):</label>
+                        <input type="number" id="sag" value="2.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Conductor Weight (kg/m):</label>
+                        <input type="number" id="weight" value="1.5">
+                    </div>
+                    <button onclick="PLA.calculateCatenary()">Calculate</button>
+                    <div id="catenary-results" class="results"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Pole Loading</h3>
+                    <div class="form-group">
+                        <label>Pole Height (m):</label>
+                        <input type="number" id="poleHeight" value="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Pole Class:</label>
+                        <select id="poleClass">
+                            <option value="H1">H1</option>
+                            <option value="H2">H2</option>
+                            <option value="1">Class 1</option>
+                            <option value="2">Class 2</option>
+                            <option value="3">Class 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Wind Speed (m/s):</label>
+                        <input type="number" id="windSpeed" value="25">
+                    </div>
+                    <button onclick="PLA.calculatePoleLoad()">Calculate</button>
+                    <div id="pole-results" class="results"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sandbox Section -->
+        <section id="sandbox" class="section">
+            <h2>Code Sandbox</h2>
+            <div class="sandbox-container">
+                <div class="editor-panel">
+                    <div class="editor-header">
+                        <span>Python (Pyodide)</span>
+                        <button onclick="PLA.runCode()">▶ Run</button>
+                    </div>
+                    <textarea id="code-editor">import numpy as np
+from pla import CatenaryCurve, PoleAnalysis
+
+# Create catenary with 50m span, 2.5m sag
+catenary = CatenaryCurve(span=50, sag=2.5)
+
+# Calculate tension
+tension = catenary.get_tension(weight=1.5)
+print(f"Horizontal Tension: {tension:.2f} N")
+
+# Get conductor length
+length = catenary.get_length()
+print(f"Conductor Length: {length:.2f} m")
+
+# Analyze pole loading
+pole = PoleAnalysis(height=15, diameter_base=0.5)
+moment = pole.calculate_moment(force=500, height=12)
+print(f"Ground-Line Moment: {moment:.2f} N⋅m")</textarea>
+                </div>
+                <div class="output-panel">
+                    <div class="output-header">Output</div>
+                    <pre id="code-output">Ready. Click Run to execute code.</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- FemtoLLM Section -->
+        <section id="llm" class="section">
+            <h2>PLA FemtoLLM</h2>
+            <p>16-dimensional nano language model specialized for pole line analysis</p>
+            <div class="llm-interface">
+                <input type="text" id="llm-input" placeholder="Ask about pole analysis...">
+                <button onclick="PLA.askLLM()">Ask</button>
+            </div>
+            <div id="llm-output" class="llm-response"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>PLA System v1.0.0 | No GPU Required | Pure CPU Efficiency</p>
+        <p><a href="https://github.com/teslasolar/PLA-">GitHub</a></p>
+    </footer>
+
+    <!-- Load PLA System -->
+    <script src="core/evgpu.js"></script>
+    <script src="core/femto-llm.js"></script>
+    <script src="core/catenary.js"></script>
+    <script src="core/pole-analysis.js"></script>
+    <script src="core/block-array.js"></script>
+    <script src="visualization/three-scene.js"></script>
+    <script src="core/pla-system.js"></script>
+    <script>
+        // Initialize PLA System on load
+        window.addEventListener('DOMContentLoaded', () => {
+            window.PLA = new PLASystem();
+            PLA.init();
+        });
+    </script>
+</body>
+</html>
