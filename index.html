@@ -3,92 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLA - Pole Line Analysis</title>
+    <title>PLA - Pole Line Analysis System</title>
+    <meta name="description" content="Browser-based pole line engineering with 3D visualization and NESC analysis">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="docs/assets/css/base.css">
     <style>
-        :root { --p: #2563eb; --d: #1f2937; --l: #f3f4f6; --ok: #10b981; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, sans-serif; background: var(--d); color: #fff; min-height: 100vh; }
-        .hero { text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, #1e3a5f, #0f172a); }
-        h1 { font-size: 3rem; margin-bottom: 0.5rem; }
-        .version { display: inline-block; background: var(--ok); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
-        .subtitle { opacity: 0.8; font-size: 1.25rem; margin-bottom: 2rem; }
-        .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: -2rem auto 2rem; padding: 0 2rem; }
-        .nav-card { background: #1e293b; border-radius: 12px; padding: 2rem; text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s; }
-        .nav-card:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .nav-card.featured { border: 2px solid #60a5fa; background: linear-gradient(135deg, #1e293b, #1e3a5f); }
-        .nav-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        .nav-card p { opacity: 0.7; font-size: 0.9rem; margin-bottom: 0.75rem; }
-        .nav-card .features { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .nav-card .tag { background: rgba(96,165,250,0.2); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; color: #60a5fa; }
-        .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; flex-wrap: wrap; }
-        .stat { text-align: center; }
-        .stat-val { font-size: 2rem; font-weight: bold; color: #60a5fa; }
-        .stat-lbl { font-size: 0.8rem; opacity: 0.6; }
-        .section-title { text-align: center; margin: 2rem 0 1rem; font-size: 1.2rem; opacity: 0.6; }
-        footer { text-align: center; padding: 2rem; opacity: 0.5; font-size: 0.8rem; }
+        .landing { min-height: 100vh; display: flex; flex-direction: column; }
+        .landing-hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1e293b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .landing-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0v60M0 30h60' stroke='%23ffffff08' fill='none'/%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .landing-hero > * { position: relative; z-index: 1; }
+        .landing-title { font-size: 3.5rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .landing-version { display: inline-block; background: linear-gradient(135deg, var(--ok), #059669); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+        .landing-subtitle { opacity: 0.85; font-size: 1.3rem; margin-bottom: 2.5rem; }
+        .landing-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+        .cta-btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cta-btn.primary { background: linear-gradient(135deg, var(--p), var(--s)); color: #fff; box-shadow: 0 4px 20px rgba(37,99,235,0.4); }
+        .cta-btn.primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(37,99,235,0.5); }
+        .cta-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .cta-btn.secondary:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+        .stats-row { display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; padding: 1rem; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 0.85rem; opacity: 0.7; }
+        .features-section { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }
+        .features-section h2 { text-align: center; margin-bottom: 2rem; font-size: 1.5rem; opacity: 0.8; }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-decoration: none;
+            color: #e2e8f0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--p), var(--ok));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(96,165,250,0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card.featured { border-color: rgba(96,165,250,0.4); background: linear-gradient(135deg, rgba(30,41,59,0.8), rgba(30,58,95,0.4)); }
+        .feature-card.featured::before { opacity: 1; }
+        .feature-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .feature-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; color: #f1f5f9; }
+        .feature-card p { font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem; line-height: 1.5; }
+        .feature-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .feature-tag { background: rgba(96,165,250,0.15); color: #60a5fa; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.7rem; }
+        footer { text-align: center; padding: 2rem; opacity: 0.5; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        footer a { color: #60a5fa; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <h1>🔌 PLA System</h1>
-        <span class="version">v4.0</span>
-        <p class="subtitle">Pole Line Analysis | 3D Engineering | 27 Feature Modules</p>
-        <div class="stats">
-            <div class="stat"><div class="stat-val">27</div><div class="stat-lbl">Feature Modules</div></div>
-            <div class="stat"><div class="stat-val">3D</div><div class="stat-lbl">Visualization</div></div>
-            <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">Engineering Calcs</div></div>
-            <div class="stat"><div class="stat-val">PWA</div><div class="stat-lbl">Offline Ready</div></div>
-        </div>
-    </div>
+    <div class="landing">
+        <div class="landing-hero">
+            <h1 class="landing-title">🔌 PLA System</h1>
+            <span class="landing-version">v4.0</span>
+            <p class="landing-subtitle">Pole Line Analysis | 3D Engineering | Browser-Based</p>
 
-    <nav class="nav-grid">
-        <a href="docs/designer/" class="nav-card featured">
-            <h2>🎯 PLA Designer v4.0</h2>
-            <p>Full-featured pole line design with 3D view, analysis, and project management</p>
-            <div class="features">
-                <span class="tag">Dashboard</span>
-                <span class="tag">Voltage Drop</span>
-                <span class="tag">Fault Current</span>
-                <span class="tag">Ruling Span</span>
-                <span class="tag">Transformer Sizing</span>
-                <span class="tag">Inspections</span>
-                <span class="tag">Progress Tracking</span>
+            <div class="landing-cta">
+                <a href="docs/designer/" class="cta-btn primary">🎯 Launch Designer</a>
+                <a href="docs/" class="cta-btn secondary">📱 Open Desktop</a>
             </div>
-        </a>
-        <a href="docs/" class="nav-card">
-            <h2>📱 Application</h2>
-            <p>Launch the full PLA system with 3D viewer, analysis tools, and AI assistant</p>
-        </a>
-        <a href="docs/sandbox/" class="nav-card">
-            <h2>🐍 Python Sandbox</h2>
-            <p>Run Python calculations in browser with NumPy via Pyodide</p>
-        </a>
-        <a href="docs/core/" class="nav-card">
-            <h2>⚡ Core Modules</h2>
-            <p>eVGPU, WebGPU, FemtoLLM, BlockArray, and compute engines</p>
-        </a>
-    </nav>
 
-    <h3 class="section-title">Engineering & Analysis Tools</h3>
-    <nav class="nav-grid">
-        <a href="docs/viz/" class="nav-card">
-            <h2>🎨 Visualization</h2>
-            <p>Three.js 3D rendering for poles, conductors, and infrastructure</p>
-        </a>
-        <a href="docs/analysis/" class="nav-card">
-            <h2>📐 Analysis</h2>
-            <p>Catenary, pole loading, clearance, and structural calculations</p>
-        </a>
-        <a href="docs/llm/" class="nav-card">
-            <h2>🤖 Browser LLM</h2>
-            <p>Run DistilGPT2, T5, or MiniLM entirely in browser (~23-80MB)</p>
-        </a>
-        <a href="docs/docs/" class="nav-card">
-            <h2>📚 Documentation</h2>
-            <p>API reference, examples, and NESC/engineering standards</p>
-        </a>
-    </nav>
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-num">27</div><div class="stat-label">Feature Modules</div></div>
+                <div class="stat-item"><div class="stat-num">3D</div><div class="stat-label">Visualization</div></div>
+                <div class="stat-item"><div class="stat-num">9</div><div class="stat-label">Engineering Calcs</div></div>
+                <div class="stat-item"><div class="stat-num">PWA</div><div class="stat-label">Offline Ready</div></div>
+            </div>
+        </div>
 
-    <footer>PLA System v4.0 | No Server Required | PWA Offline Support | GitHub Pages</footer>
+        <div class="features-section">
+            <h2>Applications</h2>
+            <div class="feature-grid">
+                <a href="docs/designer/" class="feature-card featured">
+                    <div class="feature-icon">🎯</div>
+                    <h3>PLA Designer v4.0</h3>
+                    <p>Full-featured pole line design with 3D view, analysis, and project management</p>
+                    <div class="feature-tags">
+                        <span class="feature-tag">Dashboard</span>
+                        <span class="feature-tag">Voltage Drop</span>
+                        <span class="feature-tag">Fault Current</span>
+                        <span class="feature-tag">Templates</span>
+                        <span class="feature-tag">GIS Export</span>
+                    </div>
+                </a>
+                <a href="docs/" class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>OS Desktop</h3>
+                    <p>Central hub with all PLA modules, quick tools, and 3D preview</p>
+                </a>
+                <a href="docs/sandbox/" class="feature-card">
+                    <div class="feature-icon">🐍</div>
+                    <h3>Python Sandbox</h3>
+                    <p>Run Python calculations in browser with NumPy via Pyodide</p>
+                </a>
+                <a href="docs/llm/" class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Browser AI</h3>
+                    <p>Run DistilGPT2, T5, or MiniLM entirely in browser (~23-80MB)</p>
+                </a>
+            </div>
+
+            <h2 style="margin-top: 3rem;">Engineering Tools</h2>
+            <div class="feature-grid">
+                <a href="docs/viz/" class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>3D Visualization</h3>
+                    <p>Three.js rendering for poles, conductors, and infrastructure</p>
+                </a>
+                <a href="docs/analysis/" class="feature-card">
+                    <div class="feature-icon">📐</div>
+                    <h3>Analysis Tools</h3>
+                    <p>Catenary, pole loading, clearance, and structural calculations</p>
+                </a>
+                <a href="docs/core/" class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Core Modules</h3>
+                    <p>eVGPU compute engine, WebGPU acceleration, and BlockArray</p>
+                </a>
+                <a href="docs/docs/" class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Documentation</h3>
+                    <p>API reference, examples, and NESC/engineering standards</p>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            PLA System v4.0 | No Server Required | PWA Offline Support |
+            <a href="https://github.com">GitHub</a>
+        </footer>
+    </div>
 </body>
 </html>
