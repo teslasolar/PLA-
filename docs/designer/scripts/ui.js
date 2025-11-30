@@ -1,13 +1,12 @@
 /**
- * PLA Designer - UI Helpers
+ * PLA Designer - UI Helpers (Optimized)
  */
 import { state, subscribe, toJSON } from './state.js';
 
-// DOM Elements
-let elements = {};
+let el = {};
 
 export function initUI() {
-    elements = {
+    el = {
         poleCount: document.getElementById('poleCount'),
         spanCount: document.getElementById('spanCount'),
         selectedName: document.getElementById('selectedName'),
@@ -19,260 +18,115 @@ export function initUI() {
         maxUtil: document.getElementById('maxUtil'),
         clearanceStatus: document.getElementById('clearanceStatus')
     };
-
-    // Subscribe to state changes
     subscribe('update', updateUI);
-    subscribe('selected', updateSelected);
-    subscribe('tool', updateTool);
+    subscribe('selected', id => el.selectedName && (el.selectedName.textContent = id || 'None'));
+    subscribe('tool', t => {
+        el.currentTool && (el.currentTool.textContent = t.charAt(0).toUpperCase() + t.slice(1));
+        document.querySelectorAll('.toolbar .btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(t + 'Btn')?.classList.add('active');
+    });
 }
 
 export function updateUI() {
-    if (elements.poleCount) {
-        elements.poleCount.textContent = state.poles.length;
-    }
-    if (elements.spanCount) {
-        elements.spanCount.textContent = state.spans.length;
-    }
-    updateJSON();
-}
-
-export function updateSelected(id) {
-    if (elements.selectedName) {
-        elements.selectedName.textContent = id || 'None';
-    }
-}
-
-export function updateTool(tool) {
-    if (elements.currentTool) {
-        elements.currentTool.textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
-    }
-    // Update button states
-    document.querySelectorAll('.toolbar .btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    const btn = document.getElementById(tool + 'Btn');
-    if (btn) btn.classList.add('active');
-}
-
-export function updateJSON() {
-    if (elements.jsonOutput) {
-        elements.jsonOutput.textContent = JSON.stringify(toJSON(), null, 2);
-    }
+    if (el.poleCount) el.poleCount.textContent = state.poles.length;
+    if (el.spanCount) el.spanCount.textContent = state.spans.length;
+    if (el.jsonOutput) el.jsonOutput.textContent = JSON.stringify(toJSON(), null, 2);
 }
 
 export function setStatus(msg, type = 'info') {
-    if (elements.status) {
-        elements.status.textContent = msg;
-        elements.status.style.color = type === 'error' ? '#ef4444' :
-                                      type === 'success' ? '#10b981' : '#94a3b8';
+    if (el.status) {
+        el.status.textContent = msg;
+        el.status.style.color = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#94a3b8';
     }
 }
 
-// Notifications
 export function notify(msg, type = 'info') {
-    const el = document.createElement('div');
-    el.className = `notification ${type}`;
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.classList.add('show'), 100);
-    setTimeout(() => {
-        el.classList.remove('show');
-        setTimeout(() => el.remove(), 300);
-    }, 3000);
+    const n = document.createElement('div');
+    n.className = `notification ${type}`;
+    n.textContent = msg;
+    document.body.appendChild(n);
+    setTimeout(() => n.classList.add('show'), 50);
+    setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 250); }, 2500);
 }
 
-// Properties panel
 export function showPoleProperties(pole, onUpdate, onDelete) {
-    if (!elements.propsPanel) return;
-
-    elements.propsPanel.innerHTML = `
-        <div class="form-group">
-            <label class="label">Pole ID</label>
-            <input class="input" value="${pole.id}" readonly>
+    if (!el.propsPanel) return;
+    const cls = ['H6','H5','H4','H3','H2','H1','1','2','3','4','5','6','7'];
+    const mats = ['wood','steel','concrete'];
+    el.propsPanel.innerHTML = `
+        <div class="form-group"><label class="label">ID</label><input class="input" value="${pole.id}" readonly></div>
+        <div class="form-row">
+            <div><label class="label">X</label><input class="input" type="number" id="px" value="${pole.x.toFixed(1)}"></div>
+            <div><label class="label">Z</label><input class="input" type="number" id="pz" value="${pole.z.toFixed(1)}"></div>
         </div>
         <div class="form-row">
-            <div>
-                <label class="label">X Position</label>
-                <input class="input" type="number" id="prop-x" value="${pole.x.toFixed(1)}">
-            </div>
-            <div>
-                <label class="label">Z Position</label>
-                <input class="input" type="number" id="prop-z" value="${pole.z.toFixed(1)}">
-            </div>
+            <div><label class="label">Class</label><select class="input" id="pc">${cls.map(c=>`<option ${c===pole.poleClass?'selected':''}>${c}</option>`).join('')}</select></div>
+            <div><label class="label">Height</label><input class="input" value="${pole.height} ft" readonly></div>
         </div>
-        <div class="form-row">
-            <div>
-                <label class="label">Class</label>
-                <select class="input" id="prop-class">
-                    ${['H6','H5','H4','H3','H2','H1','1','2','3','4','5','6','7'].map(c =>
-                        `<option value="${c}" ${c === pole.poleClass ? 'selected' : ''}>${c}</option>`
-                    ).join('')}
-                </select>
-            </div>
-            <div>
-                <label class="label">Height (ft)</label>
-                <input class="input" value="${pole.height}" readonly>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="label">Material</label>
-            <select class="input" id="prop-material">
-                ${['wood','steel','concrete'].map(m =>
-                    `<option value="${m}" ${m === pole.material ? 'selected' : ''}>${m}</option>`
-                ).join('')}
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="label">Capacity (lb-ft)</label>
-            <input class="input" value="${pole.capacity}" readonly>
-        </div>
-        <button class="btn danger" style="width:100%" id="delete-btn">🗑️ Delete Pole</button>
-    `;
-
-    // Add event listeners
-    document.getElementById('prop-x')?.addEventListener('change', (e) => onUpdate('x', parseFloat(e.target.value)));
-    document.getElementById('prop-z')?.addEventListener('change', (e) => onUpdate('z', parseFloat(e.target.value)));
-    document.getElementById('prop-class')?.addEventListener('change', (e) => onUpdate('poleClass', e.target.value));
-    document.getElementById('prop-material')?.addEventListener('change', (e) => onUpdate('material', e.target.value));
-    document.getElementById('delete-btn')?.addEventListener('click', onDelete);
+        <div class="form-group"><label class="label">Material</label><select class="input" id="pm">${mats.map(m=>`<option ${m===pole.material?'selected':''}>${m}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="label">Capacity</label><input class="input" value="${pole.capacity} lb-ft" readonly></div>
+        <button class="btn danger" style="width:100%" id="del">Delete</button>`;
+    document.getElementById('px')?.addEventListener('change', e => onUpdate('x', +e.target.value));
+    document.getElementById('pz')?.addEventListener('change', e => onUpdate('z', +e.target.value));
+    document.getElementById('pc')?.addEventListener('change', e => onUpdate('poleClass', e.target.value));
+    document.getElementById('pm')?.addEventListener('change', e => onUpdate('material', e.target.value));
+    document.getElementById('del')?.addEventListener('click', onDelete);
 }
 
 export function showSpanProperties(span, onUpdate, onDelete) {
-    if (!elements.propsPanel) return;
-
-    elements.propsPanel.innerHTML = `
-        <div class="form-group">
-            <label class="label">Span ID</label>
-            <input class="input" value="${span.id}" readonly>
-        </div>
+    if (!el.propsPanel) return;
+    const conds = ['Raven','Sparrow','Penguin','Dove'];
+    el.propsPanel.innerHTML = `
+        <div class="form-group"><label class="label">ID</label><input class="input" value="${span.id}" readonly></div>
         <div class="form-row">
-            <div>
-                <label class="label">From</label>
-                <input class="input" value="${span.pole1}" readonly>
-            </div>
-            <div>
-                <label class="label">To</label>
-                <input class="input" value="${span.pole2}" readonly>
-            </div>
+            <div><label class="label">From</label><input class="input" value="${span.pole1}" readonly></div>
+            <div><label class="label">To</label><input class="input" value="${span.pole2}" readonly></div>
         </div>
-        <div class="form-group">
-            <label class="label">Length (ft)</label>
-            <input class="input" value="${(span.length * 3.28084).toFixed(1)}" readonly>
-        </div>
+        <div class="form-group"><label class="label">Length</label><input class="input" value="${(span.length*3.28084).toFixed(1)} ft" readonly></div>
         <div class="form-row">
-            <div>
-                <label class="label">Phases</label>
-                <select class="input" id="prop-phases">
-                    <option value="1" ${span.phases === 1 ? 'selected' : ''}>1</option>
-                    <option value="3" ${span.phases === 3 ? 'selected' : ''}>3</option>
-                </select>
-            </div>
-            <div>
-                <label class="label">Sag (m)</label>
-                <input class="input" type="number" step="0.1" id="prop-sag" value="${span.sag}">
-            </div>
+            <div><label class="label">Phases</label><select class="input" id="sp"><option ${span.phases===1?'selected':''}>1</option><option ${span.phases===3?'selected':''}>3</option></select></div>
+            <div><label class="label">Sag (m)</label><input class="input" type="number" step="0.1" id="ss" value="${span.sag}"></div>
         </div>
-        <div class="form-group">
-            <label class="label">Conductor</label>
-            <select class="input" id="prop-conductor">
-                ${['Raven','Sparrow','Penguin','Dove'].map(c =>
-                    `<option value="${c}" ${c === span.conductor ? 'selected' : ''}>${c}</option>`
-                ).join('')}
-            </select>
-        </div>
-        <button class="btn danger" style="width:100%" id="delete-btn">🗑️ Delete Span</button>
-    `;
-
-    document.getElementById('prop-phases')?.addEventListener('change', (e) => onUpdate('phases', parseInt(e.target.value)));
-    document.getElementById('prop-sag')?.addEventListener('change', (e) => onUpdate('sag', parseFloat(e.target.value)));
-    document.getElementById('prop-conductor')?.addEventListener('change', (e) => onUpdate('conductor', e.target.value));
-    document.getElementById('delete-btn')?.addEventListener('click', onDelete);
+        <div class="form-group"><label class="label">Conductor</label><select class="input" id="sc">${conds.map(c=>`<option ${c===span.conductor?'selected':''}>${c}</option>`).join('')}</select></div>
+        <button class="btn danger" style="width:100%" id="del">Delete</button>`;
+    document.getElementById('sp')?.addEventListener('change', e => onUpdate('phases', +e.target.value));
+    document.getElementById('ss')?.addEventListener('change', e => onUpdate('sag', +e.target.value));
+    document.getElementById('sc')?.addEventListener('change', e => onUpdate('conductor', e.target.value));
+    document.getElementById('del')?.addEventListener('click', onDelete);
 }
 
 export function clearProperties() {
-    if (elements.propsPanel) {
-        elements.propsPanel.innerHTML = `
-            <div style="color: #64748b; text-align: center; padding: 1rem;">
-                Select a component to edit properties
-            </div>
-        `;
-    }
+    if (el.propsPanel) el.propsPanel.innerHTML = '<div style="color:#64748b;text-align:center;padding:1rem">Select component</div>';
 }
 
-// Analysis results
-export function showAnalysisResults(results) {
-    if (elements.totalLength) {
-        elements.totalLength.textContent = `${results.summary.totalLength} ft`;
-    }
-    if (elements.maxUtil) {
-        elements.maxUtil.textContent = `${results.summary.maxUtilization}%`;
-        elements.maxUtil.className = `result-value ${parseFloat(results.summary.maxUtilization) <= 100 ? 'pass' : 'fail'}`;
-    }
-    if (elements.clearanceStatus) {
-        elements.clearanceStatus.textContent = results.summary.overallStatus;
-        elements.clearanceStatus.className = `result-value ${results.summary.overallStatus === 'PASS' ? 'pass' : 'fail'}`;
-    }
+export function showAnalysisResults(r) {
+    if (el.totalLength) el.totalLength.textContent = `${r.summary.totalLength} ft`;
+    if (el.maxUtil) { el.maxUtil.textContent = `${r.summary.maxUtil}%`; el.maxUtil.className = `result-value ${+r.summary.maxUtil <= 100 ? 'pass' : 'fail'}`; }
+    if (el.clearanceStatus) { el.clearanceStatus.textContent = r.summary.status; el.clearanceStatus.className = `result-value ${r.summary.status === 'PASS' ? 'pass' : 'fail'}`; }
 }
 
-// Modal
-export function showModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.style.display = 'flex';
-}
+export function showModal(id) { document.getElementById(id)?.style.setProperty('display', 'flex'); }
+export function closeModal(id) { document.getElementById(id)?.style.setProperty('display', 'none'); }
 
-export function closeModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.style.display = 'none';
-}
-
-// Build palette from JSON
 export async function buildPalette(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const res = await fetch('../palette.json');
-    const palette = await res.json();
-
-    let html = '';
-    palette.categories.forEach(cat => {
-        html += `
-            <div class="category">
-                <div class="category-header" onclick="toggleCategory(this)">
-                    <span class="category-title">${cat.icon} ${cat.name}</span>
-                    <span class="category-count">${cat.items.length}</span>
-                </div>
-                <div class="category-content">
-                    ${cat.items.map(item => `
-                        <div class="item" draggable="true"
-                             data-type="${item.type}"
-                             data-props='${JSON.stringify(item.props)}'>
-                            <div class="item-icon">${item.icon}</div>
-                            <div class="item-name">${item.name}</div>
-                        </div>
-                    `).join('')}
-                </div>
+    const c = document.getElementById(containerId);
+    if (!c) return;
+    const p = await fetch('../palette.json').then(r => r.json());
+    c.innerHTML = p.categories.map(cat => `
+        <div class="category">
+            <div class="category-header" onclick="toggleCategory(this)">
+                <span class="category-title">${cat.icon} ${cat.name}</span>
+                <span class="category-count">${cat.items.length}</span>
             </div>
-        `;
-    });
-
-    container.innerHTML = html;
+            <div class="category-content">${cat.items.map(i => `
+                <div class="item" draggable="true" data-type="${i.type}" data-props='${JSON.stringify(i.props)}'>
+                    <div class="item-icon">${i.icon}</div>
+                    <div class="item-name">${i.name}</div>
+                </div>`).join('')}
+            </div>
+        </div>`).join('');
 }
 
-// Toggle category
-window.toggleCategory = function(el) {
-    el.nextElementSibling.classList.toggle('collapsed');
-};
+window.toggleCategory = el => el.nextElementSibling.classList.toggle('collapsed');
 
-export default {
-    initUI,
-    updateUI,
-    setStatus,
-    notify,
-    showPoleProperties,
-    showSpanProperties,
-    clearProperties,
-    showAnalysisResults,
-    showModal,
-    closeModal,
-    buildPalette
-};
+export default { initUI, updateUI, setStatus, notify, showPoleProperties, showSpanProperties, clearProperties, showAnalysisResults, showModal, closeModal, buildPalette };

@@ -1,81 +1,17 @@
 {
   "clearances": {
     "ground": {
-      "description": "Minimum ground clearances (Rule 232)",
-      "voltages": {
-        "0-750": {
-          "roads": 18.5,
-          "pedestrian": 15.5,
-          "residential": 12.0,
-          "agricultural": 15.5,
-          "forest": 15.5
-        },
-        "750-22000": {
-          "roads": 18.5,
-          "pedestrian": 16.5,
-          "residential": 13.5,
-          "agricultural": 16.5,
-          "forest": 16.5
-        },
-        "22000-50000": {
-          "roads": 19.0,
-          "pedestrian": 17.0,
-          "residential": 14.0,
-          "agricultural": 17.0,
-          "forest": 17.0
-        }
-      },
-      "adder": {
-        "formula": "0.4 * ((voltage - 22000) / 1000)",
-        "applies": ">22kV"
-      }
+      "0-750":{"road":18.5,"ped":15.5,"res":12,"ag":15.5},
+      "750-22k":{"road":18.5,"ped":16.5,"res":13.5,"ag":16.5},
+      "22k-50k":{"road":19,"ped":17,"res":14,"ag":17}
     },
-    "horizontal": {
-      "description": "Horizontal clearances from buildings (Rule 234)",
-      "voltages": {
-        "0-750": { "from_building": 3.0, "from_signs": 5.0 },
-        "750-22000": { "from_building": 4.5, "from_signs": 6.5 },
-        "22000-50000": { "from_building": 5.0, "from_signs": 7.0 }
-      }
-    },
-    "vertical_separation": {
-      "description": "Vertical separation between conductors (Rule 235)",
-      "same_owner": {
-        "0-8700": 12,
-        "8700-50000": 24
-      },
-      "different_owner": {
-        "0-8700": 16,
-        "8700-50000": 40
-      }
-    }
+    "horiz":{"0-750":3,"750-22k":4.5,"22k-50k":5},
+    "vert":{"same":{"0-8.7k":12,"8.7k+":24},"diff":{"0-8.7k":16,"8.7k+":40}}
   },
   "loading": {
-    "districts": {
-      "heavy": { "ice": 0.5, "wind": 4, "temp": 0 },
-      "medium": { "ice": 0.25, "wind": 4, "temp": 15 },
-      "light": { "ice": 0, "wind": 9, "temp": 30 },
-      "warm_island": { "ice": 0, "wind": 9, "temp": 50 }
-    },
-    "overload_factors": {
-      "grade_b": {
-        "crossings": 2.50,
-        "else": 2.50
-      },
-      "grade_c": {
-        "crossings": 2.20,
-        "else": 2.20
-      },
-      "grade_n": {
-        "crossings": 1.00,
-        "else": 1.00
-      }
-    }
+    "dist":{"heavy":{"ice":0.5,"wind":4,"t":0},"medium":{"ice":0.25,"wind":4,"t":15},"light":{"ice":0,"wind":9,"t":30}},
+    "ovl":{"B":{"x":2.5,"e":2.5},"C":{"x":2.2,"e":2.2},"N":{"x":1,"e":1}}
   },
-  "units": {
-    "clearance": "ft",
-    "ice": "inches radial",
-    "wind": "psf",
-    "temp": "°F"
-  }
+  "guys":{"depth":{"soil":6,"rock":3},"lead":{"norm":1,"steep":0.75},"sf":2.0},
+  "strength":{"3/8":10800,"7/16":15400,"1/2":20400}
 }

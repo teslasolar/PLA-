@@ -1,44 +1,24 @@
 {
   "acsr": {
-    "description": "Aluminum Conductor Steel Reinforced",
-    "types": {
-      "Turkey": { "size": "#6", "stranding": "6/1", "diameter": 0.198, "weight": 0.0206, "strength": 1190, "resistance": 2.570 },
-      "Swan": { "size": "#4", "stranding": "6/1", "diameter": 0.250, "weight": 0.0328, "strength": 1860, "resistance": 1.620 },
-      "Swanate": { "size": "#4", "stranding": "7/1", "diameter": 0.257, "weight": 0.0372, "strength": 2360, "resistance": 1.540 },
-      "Sparrow": { "size": "#2", "stranding": "6/1", "diameter": 0.316, "weight": 0.0522, "strength": 2850, "resistance": 1.020 },
-      "Sparate": { "size": "#2", "stranding": "7/1", "diameter": 0.325, "weight": 0.0592, "strength": 3640, "resistance": 0.969 },
-      "Robin": { "size": "1/0", "stranding": "6/1", "diameter": 0.398, "weight": 0.0829, "strength": 4380, "resistance": 0.641 },
-      "Raven": { "size": "1/0", "stranding": "6/1", "diameter": 0.398, "weight": 0.0829, "strength": 4380, "resistance": 0.641 },
-      "Quail": { "size": "2/0", "stranding": "6/1", "diameter": 0.447, "weight": 0.1045, "strength": 5310, "resistance": 0.508 },
-      "Pigeon": { "size": "3/0", "stranding": "6/1", "diameter": 0.502, "weight": 0.1318, "strength": 6620, "resistance": 0.403 },
-      "Penguin": { "size": "4/0", "stranding": "6/1", "diameter": 0.563, "weight": 0.1663, "strength": 8350, "resistance": 0.319 },
-      "Waxwing": { "size": "266.8", "stranding": "18/1", "diameter": 0.609, "weight": 0.2043, "strength": 6880, "resistance": 0.264 },
-      "Partridge": { "size": "266.8", "stranding": "26/7", "diameter": 0.642, "weight": 0.3673, "strength": 11300, "resistance": 0.255 },
-      "Merlin": { "size": "336.4", "stranding": "18/1", "diameter": 0.684, "weight": 0.2577, "strength": 8680, "resistance": 0.210 },
-      "Linnet": { "size": "336.4", "stranding": "26/7", "diameter": 0.721, "weight": 0.4630, "strength": 14100, "resistance": 0.202 },
-      "Oriole": { "size": "336.4", "stranding": "30/7", "diameter": 0.741, "weight": 0.5220, "strength": 17300, "resistance": 0.195 },
-      "Chickadee": { "size": "397.5", "stranding": "18/1", "diameter": 0.743, "weight": 0.3043, "strength": 10200, "resistance": 0.178 },
-      "Ibis": { "size": "397.5", "stranding": "26/7", "diameter": 0.783, "weight": 0.5469, "strength": 16300, "resistance": 0.171 },
-      "Dove": { "size": "556.5", "stranding": "26/7", "diameter": 0.927, "weight": 0.7653, "strength": 22600, "resistance": 0.122 },
-      "Drake": { "size": "795", "stranding": "26/7", "diameter": 1.108, "weight": 1.094, "strength": 31500, "resistance": 0.0856 }
-    }
+    "Turkey":{"sz":"#6","str":"6/1","d":0.198,"w":0.0206,"s":1190,"r":2.57},
+    "Swan":{"sz":"#4","str":"6/1","d":0.25,"w":0.0328,"s":1860,"r":1.62},
+    "Sparrow":{"sz":"#2","str":"6/1","d":0.316,"w":0.0522,"s":2850,"r":1.02},
+    "Robin":{"sz":"1/0","str":"6/1","d":0.398,"w":0.0829,"s":4380,"r":0.641},
+    "Raven":{"sz":"1/0","str":"6/1","d":0.398,"w":0.0829,"s":4380,"r":0.641},
+    "Quail":{"sz":"2/0","str":"6/1","d":0.447,"w":0.1045,"s":5310,"r":0.508},
+    "Pigeon":{"sz":"3/0","str":"6/1","d":0.502,"w":0.1318,"s":6620,"r":0.403},
+    "Penguin":{"sz":"4/0","str":"6/1","d":0.563,"w":0.1663,"s":8350,"r":0.319},
+    "Partridge":{"sz":"266.8","str":"26/7","d":0.642,"w":0.3673,"s":11300,"r":0.255},
+    "Linnet":{"sz":"336.4","str":"26/7","d":0.721,"w":0.463,"s":14100,"r":0.202},
+    "Dove":{"sz":"556.5","str":"26/7","d":0.927,"w":0.7653,"s":22600,"r":0.122},
+    "Drake":{"sz":"795","str":"26/7","d":1.108,"w":1.094,"s":31500,"r":0.0856}
   },
   "aac": {
-    "description": "All Aluminum Conductor",
-    "types": {
-      "Poppy": { "size": "#4", "stranding": "7", "diameter": 0.257, "weight": 0.0240, "strength": 881, "resistance": 1.54 },
-      "Aster": { "size": "#2", "stranding": "7", "diameter": 0.325, "weight": 0.0382, "strength": 1350, "resistance": 0.968 },
-      "Phlox": { "size": "1/0", "stranding": "7", "diameter": 0.398, "weight": 0.0608, "strength": 2140, "resistance": 0.637 },
-      "Oxlip": { "size": "2/0", "stranding": "7", "diameter": 0.447, "weight": 0.0767, "strength": 2700, "resistance": 0.505 },
-      "Tulip": { "size": "#6", "stranding": "7", "diameter": 0.204, "weight": 0.0151, "strength": 563, "resistance": 2.45 },
-      "Daisy": { "size": "4/0", "stranding": "7", "diameter": 0.563, "weight": 0.1219, "strength": 4280, "resistance": 0.318 }
-    }
+    "Tulip":{"sz":"#6","d":0.204,"w":0.0151,"s":563,"r":2.45},
+    "Poppy":{"sz":"#4","d":0.257,"w":0.024,"s":881,"r":1.54},
+    "Aster":{"sz":"#2","d":0.325,"w":0.0382,"s":1350,"r":0.968},
+    "Phlox":{"sz":"1/0","d":0.398,"w":0.0608,"s":2140,"r":0.637},
+    "Daisy":{"sz":"4/0","d":0.563,"w":0.1219,"s":4280,"r":0.318}
   },
-  "units": {
-    "size": "AWG or kcmil",
-    "diameter": "inches",
-    "weight": "lb/ft",
-    "strength": "lb",
-    "resistance": "ohms/1000ft at 20°C"
-  }
+  "keys":{"sz":"awg_kcmil","str":"stranding","d":"dia_in","w":"wt_lb_ft","s":"strength_lb","r":"ohm_1kft"}
 }

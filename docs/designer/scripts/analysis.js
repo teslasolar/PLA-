@@ -1,230 +1,171 @@
 /**
- * PLA Designer - Structural Analysis
+ * PLA Designer - Structural Analysis (Optimized)
  */
 import { state, getConnectedSpans } from './state.js';
+import { totalGuyMoment, getGuysForPole, requiredGuySize } from './guys.js';
 
-// Load NESC specs
-let nescSpecs = null;
+let nesc = null;
+
 export async function loadNESCSpecs() {
-    const res = await fetch('../specs/nesc.json');
-    nescSpecs = await res.json();
-    return nescSpecs;
+    nesc = await fetch('../specs/nesc.json').then(r => r.json());
+    return nesc;
 }
 
-// Get overload factor
-export function getOverloadFactor(grade = 'C', isCrossing = false) {
-    const key = isCrossing ? 'crossings' : 'else';
-    return nescSpecs?.loading?.overload_factors?.[`grade_${grade.toLowerCase()}`]?.[key] || 2.2;
+// Overload factor (expanded from compressed keys)
+export function getOverloadFactor(grade = 'C', isCross = false) {
+    const g = nesc?.loading?.ovl?.[grade.toUpperCase()];
+    return g ? (isCross ? g.x : g.e) : 2.2;
 }
 
-// Calculate wind force on conductor
-export function windForceOnConductor(span, windPressure = 4) {
-    // F = pressure * projected_area
-    // Simplified: assume 0.5" conductor diameter
-    const diameter = 0.5 / 12; // ft
-    return windPressure * diameter * span;
+// Wind force on conductor
+export function windOnConductor(span, windPsf = 4) {
+    return windPsf * (0.5 / 12) * span; // 0.5" dia assumed
 }
 
-// Calculate wind force on pole
-export function windForceOnPole(height, avgDiameter = 0.5) {
-    const windPressure = 4; // psf
-    return windPressure * avgDiameter * height;
+// Wind force on pole
+export function windOnPole(height, avgDia = 0.5) {
+    return 4 * avgDia * height;
 }
 
-// Calculate ground-line moment for a pole
-export function calculateMoment(poleId, windPressure = 4) {
+// Ice load (lb/ft)
+export function iceLoad(dia, district = 'medium') {
+    const ice = nesc?.loading?.dist?.[district]?.ice || 0.25;
+    return 1.24 * ice * (dia + ice); // π * ρ_ice * t * (d + t)
+}
+
+// Total conductor load with ice + wind
+export function totalConductorLoad(span, condDia = 0.5, district = 'medium') {
+    const wind = windOnConductor(span);
+    const ice = iceLoad(condDia, district) * span;
+    return Math.sqrt(wind * wind + ice * ice);
+}
+
+// Ground-line moment
+export function calculateMoment(poleId, windPsf = 4) {
     const pole = state.poles.find(p => p.id === poleId);
     if (!pole) return 0;
 
     let moment = 0;
-    const connectedSpans = getConnectedSpans(poleId);
+    const spans = getConnectedSpans(poleId);
 
-    // Conductor loads
-    connectedSpans.forEach(span => {
-        const windSpan = span.length * 3.28084 / 2; // Half span in ft
-        const conductorForce = windForceOnConductor(windSpan, windPressure) * span.phases;
-        const attachHeight = pole.height * 0.9;
-        moment += conductorForce * attachHeight;
+    // Conductor wind loads
+    spans.forEach(s => {
+        const windSpan = s.length * 3.28084 / 2;
+        const force = windOnConductor(windSpan, windPsf) * (s.phases || 3);
+        moment += force * (pole.height * 0.9);
     });
 
     // Pole wind load
-    const poleForce = windForceOnPole(pole.height);
-    const centroid = pole.height * 0.6; // Approximate centroid
-    moment += poleForce * centroid;
+    moment += windOnPole(pole.height) * (pole.height * 0.6);
 
     return moment;
 }
 
-// Calculate pole utilization
+// Utilization with guy resistance
 export function calculateUtilization(poleId, grade = 'C') {
     const pole = state.poles.find(p => p.id === poleId);
     if (!pole) return 0;
 
     const moment = calculateMoment(poleId);
+    const guyResist = totalGuyMoment(poleId);
+    const netMoment = Math.max(0, moment - guyResist);
     const factor = getOverloadFactor(grade);
 
-    return (moment * factor / pole.capacity) * 100;
+    return (netMoment * factor / pole.capacity) * 100;
 }
 
-// Check if pole passes
+// Status check
 export function checkPoleStatus(poleId, grade = 'C') {
     const util = calculateUtilization(poleId, grade);
-    return {
-        utilization: util,
-        status: util <= 100 ? 'PASS' : 'FAIL',
-        margin: 100 - util
-    };
+    return { utilization: util, status: util <= 100 ? 'PASS' : 'FAIL', margin: 100 - util };
 }
 
-// Run full analysis
+// Recommended class for moment
+const CLASSES = ['7','6','5','4','3','2','1','H1','H2','H3','H4','H5','H6'];
+const CAPS = [1200,1500,1900,2400,3000,3700,4500,6400,8000,10000,12400,16000,19800];
+
+export function getRecommendedClass(reqCap) {
+    for (let i = 0; i < CLASSES.length; i++) if (CAPS[i] >= reqCap) return CLASSES[i];
+    return 'H6+';
+}
+
+// Clearance check
+export function checkClearance(attachH, sag, groundElev = 0, voltage = '750-22k', type = 'road') {
+    const req = nesc?.clearances?.ground?.[voltage]?.[type] || 18.5;
+    const actual = attachH - sag - groundElev;
+    return { actual, required: req, margin: actual - req, status: actual >= req ? 'PASS' : 'FAIL' };
+}
+
+// Full analysis
 export function runAnalysis(grade = 'C') {
     const results = {
         poles: [],
         spans: [],
-        summary: {
-            totalPoles: state.poles.length,
-            totalSpans: state.spans.length,
-            totalLength: 0,
-            maxUtilization: 0,
-            failingPoles: 0,
-            overallStatus: 'PASS'
-        }
+        guys: [],
+        summary: { totalPoles: state.poles.length, totalSpans: state.spans.length, totalLength: 0, maxUtil: 0, failing: 0, status: 'PASS' }
     };
 
-    // Analyze each pole
+    // Poles
     state.poles.forEach(pole => {
         const moment = calculateMoment(pole.id);
+        const guyResist = totalGuyMoment(pole.id);
         const factor = getOverloadFactor(grade);
-        const utilization = (moment * factor / pole.capacity) * 100;
-        const status = utilization <= 100 ? 'PASS' : 'FAIL';
+        const util = Math.max(0, (moment - guyResist) * factor / pole.capacity) * 100;
+        const status = util <= 100 ? 'PASS' : 'FAIL';
+        const guys = getGuysForPole(pole.id);
 
         results.poles.push({
-            id: pole.id,
-            poleClass: pole.poleClass,
-            height: pole.height,
-            capacity: pole.capacity,
-            moment: Math.round(moment),
-            factor,
-            utilization: utilization.toFixed(1),
-            status,
-            recommendation: utilization > 100 ?
-                `Upgrade to Class ${getRecommendedClass(moment * factor)}` : null
+            id: pole.id, poleClass: pole.poleClass, height: pole.height, capacity: pole.capacity,
+            moment: Math.round(moment), guyResist: Math.round(guyResist), factor,
+            utilization: util.toFixed(1), status, guyCount: guys.length,
+            rec: util > 100 ? (guys.length === 0 ? 'Add guy wire or upgrade pole' : `Upgrade to Class ${getRecommendedClass((moment - guyResist) * factor)}`) : null
         });
 
-        if (utilization > results.summary.maxUtilization) {
-            results.summary.maxUtilization = utilization;
-        }
-        if (status === 'FAIL') {
-            results.summary.failingPoles++;
-        }
+        if (util > results.summary.maxUtil) results.summary.maxUtil = util;
+        if (status === 'FAIL') results.summary.failing++;
     });
 
-    // Analyze spans
-    state.spans.forEach(span => {
-        const lengthFt = span.length * 3.28084;
-        results.summary.totalLength += lengthFt;
-
-        results.spans.push({
-            id: span.id,
-            pole1: span.pole1,
-            pole2: span.pole2,
-            length: lengthFt.toFixed(1),
-            phases: span.phases,
-            sag: span.sag,
-            conductor: span.conductor
-        });
+    // Spans
+    state.spans.forEach(s => {
+        const len = s.length * 3.28084;
+        results.summary.totalLength += len;
+        results.spans.push({ id: s.id, pole1: s.pole1, pole2: s.pole2, length: len.toFixed(1), phases: s.phases, sag: s.sag, conductor: s.conductor });
     });
 
-    // Overall status
-    results.summary.overallStatus = results.summary.failingPoles > 0 ? 'FAIL' : 'PASS';
-    results.summary.maxUtilization = results.summary.maxUtilization.toFixed(1);
+    // Guys
+    state.guys.forEach(g => {
+        results.guys.push({ id: g.id, poleId: g.poleId, size: g.size, strength: g.strength });
+    });
+
+    results.summary.status = results.summary.failing > 0 ? 'FAIL' : 'PASS';
+    results.summary.maxUtil = results.summary.maxUtil.toFixed(1);
     results.summary.totalLength = results.summary.totalLength.toFixed(0);
-
     return results;
 }
 
-// Get recommended pole class for given moment
-export function getRecommendedClass(requiredCapacity) {
-    const classes = ['7', '6', '5', '4', '3', '2', '1', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
-    const capacities = [1200, 1500, 1900, 2400, 3000, 3700, 4500, 6400, 8000, 10000, 12400, 16000, 19800];
-
-    for (let i = 0; i < classes.length; i++) {
-        if (capacities[i] >= requiredCapacity) {
-            return classes[i];
-        }
-    }
-    return 'H6+';
-}
-
-// Check clearance
-export function checkClearance(attachmentHeight, sag, groundElevation = 0, type = 'roads') {
-    const minClearance = attachmentHeight - sag - groundElevation;
-    const required = nescSpecs?.clearances?.ground?.voltages?.['750-22000']?.[type] || 18.5;
-
-    return {
-        actual: minClearance,
-        required,
-        margin: minClearance - required,
-        status: minClearance >= required ? 'PASS' : 'FAIL'
-    };
-}
-
-// Generate report
+// Report generation
 export function generateReport(grade = 'C') {
-    const analysis = runAnalysis(grade);
-    const lines = [];
-
-    lines.push('═══════════════════════════════════════════════════════════');
-    lines.push('           PLA STRUCTURAL ANALYSIS REPORT');
-    lines.push('═══════════════════════════════════════════════════════════');
-    lines.push(`Date: ${new Date().toLocaleString()}`);
-    lines.push(`Grade: ${grade}`);
-    lines.push('');
-    lines.push('SUMMARY');
-    lines.push('───────────────────────────────────────────────────────────');
-    lines.push(`Total Poles:        ${analysis.summary.totalPoles}`);
-    lines.push(`Total Spans:        ${analysis.summary.totalSpans}`);
-    lines.push(`Total Length:       ${analysis.summary.totalLength} ft`);
-    lines.push(`Max Utilization:    ${analysis.summary.maxUtilization}%`);
-    lines.push(`Failing Poles:      ${analysis.summary.failingPoles}`);
-    lines.push(`Overall Status:     ${analysis.summary.overallStatus}`);
-    lines.push('');
-    lines.push('POLE ANALYSIS');
-    lines.push('───────────────────────────────────────────────────────────');
-
-    analysis.poles.forEach(pole => {
-        lines.push(`${pole.id} (Class ${pole.poleClass}, ${pole.height}ft)`);
-        lines.push(`  Moment:      ${pole.moment} / ${pole.capacity} lb-ft`);
-        lines.push(`  Utilization: ${pole.utilization}%`);
-        lines.push(`  Status:      ${pole.status}`);
-        if (pole.recommendation) {
-            lines.push(`  ⚠️  ${pole.recommendation}`);
-        }
-        lines.push('');
+    const a = runAnalysis(grade);
+    const L = [];
+    L.push('═'.repeat(60), '           PLA STRUCTURAL ANALYSIS REPORT', '═'.repeat(60));
+    L.push(`Date: ${new Date().toLocaleString()}  |  Grade: ${grade}`, '');
+    L.push('SUMMARY', '─'.repeat(60));
+    L.push(`Poles: ${a.summary.totalPoles}  |  Spans: ${a.summary.totalSpans}  |  Length: ${a.summary.totalLength} ft`);
+    L.push(`Max Util: ${a.summary.maxUtil}%  |  Failing: ${a.summary.failing}  |  Status: ${a.summary.status}`, '');
+    L.push('POLE ANALYSIS', '─'.repeat(60));
+    a.poles.forEach(p => {
+        L.push(`${p.id} (Class ${p.poleClass}, ${p.height}ft) - ${p.status}`);
+        L.push(`  Moment: ${p.moment} lb-ft | Guy Resist: ${p.guyResist} lb-ft | Util: ${p.utilization}%`);
+        if (p.rec) L.push(`  ⚠️  ${p.rec}`);
     });
-
-    lines.push('SPAN ANALYSIS');
-    lines.push('───────────────────────────────────────────────────────────');
-
-    analysis.spans.forEach(span => {
-        lines.push(`${span.id}: ${span.pole1} → ${span.pole2}`);
-        lines.push(`  Length: ${span.length} ft | Phases: ${span.phases} | Sag: ${span.sag}m`);
-    });
-
-    lines.push('');
-    lines.push('═══════════════════════════════════════════════════════════');
-
-    return lines.join('\n');
+    L.push('', 'SPAN ANALYSIS', '─'.repeat(60));
+    a.spans.forEach(s => L.push(`${s.id}: ${s.pole1} → ${s.pole2} | ${s.length} ft | ${s.phases}φ | ${s.conductor}`));
+    if (a.guys.length) {
+        L.push('', 'GUY WIRES', '─'.repeat(60));
+        a.guys.forEach(g => L.push(`${g.id}: ${g.poleId} | ${g.size}" | ${g.strength} lb`));
+    }
+    L.push('', '═'.repeat(60));
+    return L.join('\n');
 }
 
-export default {
-    loadNESCSpecs,
-    getOverloadFactor,
-    calculateMoment,
-    calculateUtilization,
-    checkPoleStatus,
-    runAnalysis,
-    getRecommendedClass,
-    checkClearance,
-    generateReport
-};
+export default { loadNESCSpecs, getOverloadFactor, calculateMoment, calculateUtilization, checkPoleStatus, runAnalysis, getRecommendedClass, checkClearance, generateReport };

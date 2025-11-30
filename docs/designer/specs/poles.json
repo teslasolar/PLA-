@@ -1,51 +1,25 @@
 {
   "classes": {
-    "H6": { "capacity": 19800, "heights": [75, 80, 85, 90], "groundLine": 8.5, "topDia": 7.5, "groundDia": 13.5 },
-    "H5": { "capacity": 16000, "heights": [70, 75, 80, 85], "groundLine": 8.0, "topDia": 7.0, "groundDia": 12.5 },
-    "H4": { "capacity": 12400, "heights": [65, 70, 75, 80], "groundLine": 7.5, "topDia": 6.5, "groundDia": 11.5 },
-    "H3": { "capacity": 10000, "heights": [60, 65, 70, 75], "groundLine": 7.0, "topDia": 6.0, "groundDia": 10.5 },
-    "H2": { "capacity": 8000, "heights": [55, 60, 65, 70], "groundLine": 6.5, "topDia": 5.5, "groundDia": 9.5 },
-    "H1": { "capacity": 6400, "heights": [55, 60, 65], "groundLine": 6.5, "topDia": 5.0, "groundDia": 9.0 },
-    "1": { "capacity": 4500, "heights": [40, 45, 50, 55], "groundLine": 6.0, "topDia": 4.5, "groundDia": 8.0 },
-    "2": { "capacity": 3700, "heights": [35, 40, 45, 50], "groundLine": 5.5, "topDia": 4.0, "groundDia": 7.5 },
-    "3": { "capacity": 3000, "heights": [30, 35, 40, 45], "groundLine": 5.0, "topDia": 3.5, "groundDia": 7.0 },
-    "4": { "capacity": 2400, "heights": [30, 35, 40], "groundLine": 5.0, "topDia": 3.0, "groundDia": 6.5 },
-    "5": { "capacity": 1900, "heights": [25, 30, 35], "groundLine": 4.5, "topDia": 2.5, "groundDia": 6.0 },
-    "6": { "capacity": 1500, "heights": [25, 30], "groundLine": 4.5, "topDia": 2.0, "groundDia": 5.5 },
-    "7": { "capacity": 1200, "heights": [20, 25], "groundLine": 4.0, "topDia": 1.5, "groundDia": 5.0 }
+    "H6":{"c":19800,"h":[75,80,85,90],"gl":8.5,"td":7.5,"gd":13.5},
+    "H5":{"c":16000,"h":[70,75,80,85],"gl":8.0,"td":7.0,"gd":12.5},
+    "H4":{"c":12400,"h":[65,70,75,80],"gl":7.5,"td":6.5,"gd":11.5},
+    "H3":{"c":10000,"h":[60,65,70,75],"gl":7.0,"td":6.0,"gd":10.5},
+    "H2":{"c":8000,"h":[55,60,65,70],"gl":6.5,"td":5.5,"gd":9.5},
+    "H1":{"c":6400,"h":[55,60,65],"gl":6.5,"td":5.0,"gd":9.0},
+    "1":{"c":4500,"h":[40,45,50,55],"gl":6.0,"td":4.5,"gd":8.0},
+    "2":{"c":3700,"h":[35,40,45,50],"gl":5.5,"td":4.0,"gd":7.5},
+    "3":{"c":3000,"h":[30,35,40,45],"gl":5.0,"td":3.5,"gd":7.0},
+    "4":{"c":2400,"h":[30,35,40],"gl":5.0,"td":3.0,"gd":6.5},
+    "5":{"c":1900,"h":[25,30,35],"gl":4.5,"td":2.5,"gd":6.0},
+    "6":{"c":1500,"h":[25,30],"gl":4.5,"td":2.0,"gd":5.5},
+    "7":{"c":1200,"h":[20,25],"gl":4.0,"td":1.5,"gd":5.0}
   },
+  "keys":{"c":"capacity_lb_ft","h":"heights_ft","gl":"groundLine_ft","td":"topDia_in","gd":"groundDia_in"},
   "materials": {
-    "wood": {
-      "species": ["Southern Pine", "Douglas Fir", "Western Red Cedar"],
-      "treatment": ["CCA", "Penta", "Creosote"],
-      "color": "#8B4513",
-      "roughness": 0.9,
-      "metalness": 0.1
-    },
-    "steel": {
-      "grades": ["ASTM A572 Grade 65", "ASTM A871"],
-      "finish": ["Galvanized", "Weathering"],
-      "color": "#C0C0C0",
-      "roughness": 0.3,
-      "metalness": 0.7
-    },
-    "concrete": {
-      "types": ["Spun", "Static Cast"],
-      "reinforcement": ["Prestressed", "Conventional"],
-      "color": "#808080",
-      "roughness": 0.8,
-      "metalness": 0.1
-    },
-    "composite": {
-      "types": ["FRP", "GFRP"],
-      "color": "#A0A0A0",
-      "roughness": 0.6,
-      "metalness": 0.2
-    }
+    "wood":{"clr":"#8B4513","r":0.9,"m":0.1},
+    "steel":{"clr":"#C0C0C0","r":0.3,"m":0.7},
+    "concrete":{"clr":"#808080","r":0.8,"m":0.1},
+    "composite":{"clr":"#A0A0A0","r":0.6,"m":0.2}
   },
-  "settingDepth": {
-    "formula": "length * 0.1 + 2",
-    "minimum": 5,
-    "maximum": 10
-  }
+  "setting":"L*0.1+2"
 }

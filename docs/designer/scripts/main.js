@@ -1,103 +1,84 @@
 /**
- * PLA Designer - Main Entry Point
+ * PLA Designer - Main Entry (Optimized)
  */
 import * as THREE from 'three';
 import { initScene, camera, renderer, objects, zoomIn, zoomOut, resetCamera } from './scene.js';
 import { state, select, setTool, toJSON, fromJSON, clear, subscribe } from './state.js';
-import { loadPoleSpecs, addPoleToScene, removePoleFromScene, selectPole, highlightPole } from './poles.js';
-import { loadConductorSpecs, addSpanToScene, removeSpanFromScene, rebuildSpan } from './spans.js';
+import { loadPoleSpecs, addPoleToScene, removePoleFromScene, selectPole, highlightPole, createPoleMesh } from './poles.js';
+import { loadConductorSpecs, addSpanToScene, removeSpanFromScene, rebuildSpan, createSpanMesh } from './spans.js';
 import { loadNESCSpecs, runAnalysis, generateReport } from './analysis.js';
+import { addGuyToScene, removeGuyFromScene, setNESCSpecs } from './guys.js';
 import { initUI, notify, showPoleProperties, showSpanProperties, clearProperties, showAnalysisResults, showModal, closeModal, buildPalette, updateUI } from './ui.js';
+import { addObject } from './scene.js';
 
 let params = null;
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
 
-// Initialize
 async function init() {
-    console.log('🔌 PLA Designer initializing...');
+    console.log('🔌 PLA Designer init...');
 
-    // Load configs
-    const [paramsRes, _poleSpecs, _condSpecs, _nescSpecs] = await Promise.all([
+    // Load all configs in parallel
+    const [p, , , nesc] = await Promise.all([
         fetch('../params.json').then(r => r.json()),
         loadPoleSpecs(),
         loadConductorSpecs(),
         loadNESCSpecs()
     ]);
-    params = paramsRes;
+    params = p;
+    setNESCSpecs(nesc);
 
-    // Initialize 3D scene
-    const container = document.getElementById('viewer3d');
-    await initScene(container, params);
-
-    // Initialize UI
+    // Init 3D and UI
+    await initScene(document.getElementById('viewer3d'), params);
     initUI();
     await buildPalette('palette');
+    setupEvents();
 
-    // Setup event handlers
-    setupEventListeners();
-
-    // Add demo poles
+    // Demo poles
     addPoleToScene(-40, 0, '2', 'wood');
     addPoleToScene(0, 0, '2', 'wood');
     addPoleToScene(40, 0, '2', 'wood');
     addSpanToScene('pole_1', 'pole_2');
     addSpanToScene('pole_2', 'pole_3');
 
-    console.log('✅ PLA Designer ready');
+    console.log('✅ Ready');
     notify('Designer ready!', 'success');
 }
 
-// Event listeners
-function setupEventListeners() {
-    // Canvas click for selection
-    renderer.domElement.addEventListener('click', onCanvasClick);
-
-    // Drag and drop
-    document.addEventListener('dragstart', onDragStart);
+function setupEvents() {
+    renderer.domElement.addEventListener('click', onClick);
+    document.addEventListener('dragstart', onDrag);
     document.getElementById('canvas').addEventListener('dragover', e => e.preventDefault());
     document.getElementById('canvas').addEventListener('drop', onDrop);
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKey);
 }
 
-// Canvas click handler
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
+function onClick(e) {
+    const r = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(mouse, camera);
 
-function onCanvasClick(e) {
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
     const meshes = [];
-    objects.forEach(obj => obj.traverse(c => { if (c.isMesh) meshes.push(c); }));
-    const hits = raycaster.intersectObjects(meshes);
+    objects.forEach(o => o.traverse(c => { if (c.isMesh) meshes.push(c); }));
+    const hits = ray.intersectObjects(meshes);
 
-    if (hits.length > 0) {
+    if (hits.length) {
         let obj = hits[0].object;
         while (obj.parent && !obj.userData.id) obj = obj.parent;
-
         if (obj.userData.id) {
-            if (state.tool === 'span') {
-                handleSpanTool(obj.userData.id);
-            } else {
-                selectObject(obj.userData.id);
-            }
+            state.tool === 'span' ? handleSpan(obj.userData.id) :
+            state.tool === 'guy' ? handleGuy(obj.userData.id, e) :
+            selectObj(obj.userData.id);
         }
-    } else if (state.tool === 'select') {
-        selectObject(null);
-    }
+    } else if (state.tool === 'select') selectObj(null);
 }
 
-function handleSpanTool(id) {
-    const pole = state.poles.find(p => p.id === id);
-    if (!pole) return;
-
+function handleSpan(id) {
+    if (!state.poles.find(p => p.id === id)) return;
     if (!state.spanStart) {
         state.spanStart = id;
         highlightPole(id, true);
-        notify('Click second pole to complete span', 'info');
+        notify('Click second pole', 'info');
     } else {
         if (state.spanStart !== id) {
             addSpanToScene(state.spanStart, id);
@@ -108,211 +89,127 @@ function handleSpanTool(id) {
     }
 }
 
-function selectObject(id) {
+function handleGuy(id, e) {
+    const pole = state.poles.find(p => p.id === id);
+    if (!pole) return;
+    // Calculate anchor position based on click offset
+    const r = renderer.domElement.getBoundingClientRect();
+    const dx = ((e.clientX - r.left) / r.width - 0.5) * 100;
+    const dz = ((e.clientY - r.top) / r.height - 0.5) * 100;
+    const anchorX = pole.x + (dx > 0 ? 15 : -15);
+    const anchorZ = pole.z + (dz > 0 ? 15 : -15);
+    addGuyToScene(id, pole.height * 0.85, anchorX, anchorZ, '3/8');
+    notify('Guy wire added!', 'success');
+}
+
+function selectObj(id) {
     select(id);
     selectPole(id);
+    if (!id) { clearProperties(); return; }
 
-    if (id) {
-        const pole = state.poles.find(p => p.id === id);
-        const span = state.spans.find(s => s.id === id);
-
-        if (pole) {
-            showPoleProperties(pole,
-                (prop, val) => updatePole(id, prop, val),
-                () => deletePole(id)
-            );
-        } else if (span) {
-            showSpanProperties(span,
-                (prop, val) => updateSpan(id, prop, val),
-                () => deleteSpan(id)
-            );
-        }
-    } else {
-        clearProperties();
-    }
-}
-
-function updatePole(id, prop, val) {
     const pole = state.poles.find(p => p.id === id);
-    if (pole) {
-        pole[prop] = val;
-        // Update 3D position if needed
-        const obj = objects.get(id);
-        if (obj && (prop === 'x' || prop === 'z')) {
-            obj.position[prop === 'x' ? 'x' : 'z'] = val;
-            // Rebuild connected spans
-            state.spans.filter(s => s.pole1 === id || s.pole2 === id)
-                       .forEach(s => rebuildSpan(s.id));
-        }
-        updateUI();
-    }
-}
-
-function updateSpan(id, prop, val) {
     const span = state.spans.find(s => s.id === id);
-    if (span) {
-        span[prop] = val;
-        rebuildSpan(id);
-        updateUI();
+    if (pole) showPoleProperties(pole, (k, v) => updatePole(id, k, v), () => delPole(id));
+    else if (span) showSpanProperties(span, (k, v) => updateSpan(id, k, v), () => delSpan(id));
+}
+
+function updatePole(id, k, v) {
+    const p = state.poles.find(x => x.id === id);
+    if (!p) return;
+    p[k] = v;
+    const obj = objects.get(id);
+    if (obj && (k === 'x' || k === 'z')) {
+        obj.position[k] = v;
+        state.spans.filter(s => s.pole1 === id || s.pole2 === id).forEach(s => rebuildSpan(s.id));
     }
+    updateUI();
 }
 
-function deletePole(id) {
-    removePoleFromScene(id);
-    selectObject(null);
-    notify('Pole deleted', 'info');
+function updateSpan(id, k, v) {
+    const s = state.spans.find(x => x.id === id);
+    if (s) { s[k] = v; rebuildSpan(id); updateUI(); }
 }
 
-function deleteSpan(id) {
-    removeSpanFromScene(id);
-    selectObject(null);
-    notify('Span deleted', 'info');
-}
+function delPole(id) { removePoleFromScene(id); selectObj(null); notify('Pole deleted', 'info'); }
+function delSpan(id) { removeSpanFromScene(id); selectObj(null); notify('Span deleted', 'info'); }
 
-// Drag and drop
-function onDragStart(e) {
+function onDrag(e) {
     if (e.target.classList.contains('item')) {
-        e.dataTransfer.setData('text/plain', JSON.stringify({
-            type: e.target.dataset.type,
-            props: JSON.parse(e.target.dataset.props || '{}')
-        }));
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: e.target.dataset.type, props: JSON.parse(e.target.dataset.props || '{}') }));
     }
 }
 
 function onDrop(e) {
     e.preventDefault();
-    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    const d = JSON.parse(e.dataTransfer.getData('text/plain'));
+    const r = renderer.domElement.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width - 0.5) * 200;
+    const z = ((e.clientY - r.top) / r.height - 0.5) * 200;
 
-    const rect = renderer.domElement.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 200;
-    const z = ((e.clientY - rect.top) / rect.height - 0.5) * 200;
-
-    if (data.type === 'pole') {
-        addPoleToScene(x, z, data.props.class || '2', data.props.material || 'wood');
-        notify(`Added ${data.props.material || 'wood'} pole Class ${data.props.class || '2'}`, 'success');
+    if (d.type === 'pole') {
+        addPoleToScene(x, z, d.props.class || '2', d.props.material || 'wood');
+        notify(`Added pole Class ${d.props.class || '2'}`, 'success');
     }
 }
 
-// Keyboard shortcuts
-function onKeyDown(e) {
+function onKey(e) {
     if (e.key === 'Delete' && state.selected) {
-        const pole = state.poles.find(p => p.id === state.selected);
-        if (pole) deletePole(state.selected);
-        else deleteSpan(state.selected);
+        state.poles.find(p => p.id === state.selected) ? delPole(state.selected) : delSpan(state.selected);
     } else if (e.key === 'Escape') {
-        if (state.spanStart) {
-            highlightPole(state.spanStart, false);
-            state.spanStart = null;
-        }
+        if (state.spanStart) { highlightPole(state.spanStart, false); state.spanStart = null; }
         setTool('select');
-    } else if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        saveProject();
-    }
+    } else if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveProject(); }
 }
 
-// Expose to window
-window.setTool = (tool) => {
-    setTool(tool);
-    if (state.spanStart) {
-        highlightPole(state.spanStart, false);
-        state.spanStart = null;
-    }
-};
-
-window.toggleView = () => { notify('Toggle 2D/3D', 'info'); };
+// Exposed globals
+window.setTool = t => { setTool(t); if (state.spanStart) { highlightPole(state.spanStart, false); state.spanStart = null; } };
+window.toggleView = () => notify('Toggle view', 'info');
 window.zoomIn = zoomIn;
 window.zoomOut = zoomOut;
 window.resetView = () => resetCamera(params);
 
 window.runAnalysis = () => {
-    if (state.poles.length === 0) {
-        notify('Add poles first!', 'error');
-        return;
-    }
-    const results = runAnalysis();
-    showAnalysisResults(results);
-
-    // Show modal with details
-    const resultsDiv = document.getElementById('analysisResults');
-    if (resultsDiv) {
-        resultsDiv.innerHTML = results.poles.map(pole => `
-            <div class="result-card">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <span><strong>${pole.id}</strong> (Class ${pole.poleClass})</span>
-                    <span class="result-value ${pole.status === 'PASS' ? 'pass' : 'fail'}">${pole.status}</span>
-                </div>
-                <div style="font-size:0.8rem;color:#94a3b8;margin-top:0.5rem;">
-                    Moment: ${pole.moment} / ${pole.capacity} lb-ft | Utilization: ${pole.utilization}%
-                </div>
-                ${pole.recommendation ? `<div style="color:#f59e0b;font-size:0.8rem;">⚠️ ${pole.recommendation}</div>` : ''}
-            </div>
-        `).join('');
-    }
+    if (!state.poles.length) { notify('Add poles first!', 'error'); return; }
+    const res = runAnalysis();
+    showAnalysisResults(res);
+    document.getElementById('analysisResults').innerHTML = res.poles.map(p => `
+        <div class="result-card">
+            <div style="display:flex;justify-content:space-between"><strong>${p.id}</strong> <span class="result-value ${p.status === 'PASS' ? 'pass' : 'fail'}">${p.status}</span></div>
+            <div style="font-size:0.8rem;color:#94a3b8">Moment: ${p.moment} | Guy: ${p.guyResist} | Util: ${p.utilization}%</div>
+            ${p.rec ? `<div style="color:#f59e0b;font-size:0.8rem">⚠️ ${p.rec}</div>` : ''}
+        </div>
+    `).join('');
     showModal('analysisModal');
     notify('Analysis complete!', 'success');
 };
 
-window.showReport = () => {
-    const report = generateReport();
-    console.log(report);
-    window.runAnalysis();
-};
-
+window.showReport = () => { console.log(generateReport()); window.runAnalysis(); };
 window.closeModal = closeModal;
 
-window.saveProject = () => {
-    localStorage.setItem('pla-project', JSON.stringify(toJSON()));
-    notify('Project saved!', 'success');
-};
-
+window.saveProject = () => { localStorage.setItem('pla-project', JSON.stringify(toJSON())); notify('Saved!', 'success'); };
 window.loadProject = () => {
-    const data = localStorage.getItem('pla-project');
-    if (data) {
-        clear();
-        objects.forEach((obj, id) => {
-            if (id.startsWith('pole_') || id.startsWith('span_')) {
-                objects.delete(id);
-            }
-        });
-        fromJSON(JSON.parse(data));
-        // Rebuild visuals
-        state.poles.forEach(p => {
-            const mesh = createPoleMesh(p);
-            addObject(p.id, mesh);
-        });
-        state.spans.forEach(s => {
-            const mesh = createSpanMesh(s);
-            addObject(s.id, mesh);
-        });
-        notify('Project loaded!', 'success');
-    }
+    const d = localStorage.getItem('pla-project');
+    if (!d) return;
+    clear();
+    objects.forEach((_, id) => { if (id.startsWith('pole_') || id.startsWith('span_') || id.startsWith('guy_')) objects.delete(id); });
+    fromJSON(JSON.parse(d));
+    state.poles.forEach(p => addObject(p.id, createPoleMesh(p)));
+    state.spans.forEach(s => { const m = createSpanMesh({ id: s.id, pole1Id: s.pole1, pole2Id: s.pole2, phases: s.phases, sag: s.sag }); if (m) addObject(s.id, m); });
+    notify('Loaded!', 'success');
 };
 
 window.exportProject = () => {
-    const data = JSON.stringify(toJSON(), null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'pla-project.json';
-    a.click();
-    notify('Project exported!', 'success');
+    const blob = new Blob([JSON.stringify(toJSON(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'pla-project.json'; a.click();
+    notify('Exported!', 'success');
 };
 
-window.copyJSON = () => {
-    navigator.clipboard.writeText(document.getElementById('jsonOutput')?.textContent || '{}');
-    notify('JSON copied!', 'success');
-};
+window.copyJSON = () => { navigator.clipboard.writeText(document.getElementById('jsonOutput')?.textContent || '{}'); notify('Copied!', 'success'); };
 
 window.exportReport = () => {
-    const report = generateReport();
-    const blob = new Blob([report], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'pla-analysis-report.txt';
-    a.click();
+    const blob = new Blob([generateReport()], { type: 'text/plain' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'pla-report.txt'; a.click();
     notify('Report exported!', 'success');
 };
 
-// Initialize on load
 init();
