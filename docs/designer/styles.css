@@ -198,3 +198,81 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .size-option.overload{background:rgba(239,68,68,.2)}
 .size-val{display:block;font-weight:600}
 .size-loading{font-size:.7rem;color:var(--txt2)}
+
+/* Templates */
+.templates-list{display:flex;flex-direction:column;gap:.5rem;max-height:60vh;overflow-y:auto}
+.template-item{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:1rem;cursor:pointer;transition:all .15s}
+.template-item:hover{background:rgba(59,130,246,.15);border-color:var(--acc);transform:translateX(4px)}
+.template-name{font-weight:600;color:var(--txt);margin-bottom:.25rem}
+.template-desc{font-size:.8rem;color:var(--txt2)}
+
+/* GIS Dialog */
+.gis-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.gis-origin{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.gis-origin .input{width:120px}
+
+/* BOM Table */
+.bom-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.bom-table th,.bom-table td{padding:.5rem;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)}
+.bom-table th{background:rgba(0,0,0,.2);color:var(--txt2);font-weight:600}
+.bom-table tr:hover{background:rgba(255,255,255,.05)}
+.bom-summary{display:flex;gap:2rem;margin-top:1rem;padding:1rem;background:rgba(0,0,0,.2);border-radius:6px}
+
+/* Staking Sheet */
+.staking-header{display:flex;justify-content:space-between;padding:1rem;background:rgba(0,0,0,.2);border-radius:6px;margin-bottom:1rem}
+.staking-table{width:100%;border-collapse:collapse;font-size:.75rem}
+.staking-table th,.staking-table td{padding:.4rem;border:1px solid rgba(255,255,255,.1)}
+
+/* Cost Estimate */
+.cost-sections{display:flex;flex-direction:column;gap:1rem}
+.cost-section{background:rgba(0,0,0,.15);border-radius:6px;padding:1rem}
+.cost-section h4{margin-bottom:.5rem;color:var(--acc)}
+.cost-line{display:flex;justify-content:space-between;padding:.3rem 0;font-size:.8rem}
+.cost-total{font-weight:700;border-top:2px solid var(--acc);padding-top:.5rem;margin-top:.5rem}
+
+/* Bulk Edit */
+.bulk-selection{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.bulk-count{background:var(--acc2);padding:.2rem .5rem;border-radius:12px;font-size:.75rem}
+.bulk-form{display:grid;grid-template-columns:1fr 2fr;gap:.5rem;align-items:center}
+
+/* Photos */
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+.photo-thumb{aspect-ratio:1;background:rgba(0,0,0,.3);border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-upload{border:2px dashed rgba(255,255,255,.2);border-radius:6px;padding:2rem;text-align:center;cursor:pointer}
+.photo-upload:hover{border-color:var(--acc)}
+
+/* Version History */
+.versions-list{display:flex;flex-direction:column;gap:.4rem;max-height:50vh;overflow-y:auto}
+.version-item{display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:rgba(0,0,0,.2);border-radius:6px}
+.version-item:hover{background:rgba(0,0,0,.3)}
+.version-info{flex:1}
+.version-name{font-weight:600}
+.version-date{font-size:.7rem;color:var(--txt2)}
+
+/* Comments */
+.comments-list{display:flex;flex-direction:column;gap:.5rem;max-height:40vh;overflow-y:auto;margin-bottom:1rem}
+.comment{background:rgba(0,0,0,.2);border-radius:6px;padding:.6rem}
+.comment-header{display:flex;justify-content:space-between;margin-bottom:.25rem}
+.comment-author{font-weight:600;font-size:.8rem}
+.comment-date{font-size:.7rem;color:var(--txt2)}
+.comment-text{font-size:.85rem}
+.comment-form{display:flex;gap:.5rem}
+.comment-form textarea{flex:1;resize:none;height:60px}
+
+/* Annotations */
+.annotation-tools{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.annotation-colors{display:flex;gap:.25rem}
+.color-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent}
+.color-swatch.active{border-color:#fff}
+
+/* Measure Tool */
+.measure-result{font-size:1.5rem;text-align:center;padding:1rem;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:1rem}
+.measure-points{display:flex;flex-direction:column;gap:.3rem}
+.measure-point{display:flex;justify-content:space-between;font-size:.8rem;padding:.3rem .5rem;background:rgba(0,0,0,.15);border-radius:4px}
+
+/* Wind Controls */
+.wind-controls{display:flex;flex-direction:column;gap:1rem}
+.wind-slider{display:flex;align-items:center;gap:1rem}
+.wind-slider input[type="range"]{flex:1}
+.wind-preview{text-align:center;padding:1rem;background:rgba(0,0,0,.2);border-radius:6px}

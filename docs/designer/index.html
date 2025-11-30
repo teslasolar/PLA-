@@ -249,6 +249,195 @@
         </div>
     </div>
 
+    <!-- Templates Modal -->
+    <div class="modal" id="templatesModal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-title">📋 Pole Templates</div>
+            <div id="templatesContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('templatesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clearance Modal -->
+    <div class="modal" id="clearanceModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">📏 NESC Clearance Check</div>
+            <div id="clearanceContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('clearanceModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Diagram Modal -->
+    <div class="modal" id="loadingDiagramModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">📊 Loading Diagram</div>
+            <div id="loadingDiagramContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('loadingDiagramModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guying Calculator Modal -->
+    <div class="modal" id="guyingModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">🔗 Guying Calculator</div>
+            <div id="guyingContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('guyingModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stringing Modal -->
+    <div class="modal" id="stringingModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">🧵 Stringing Chart</div>
+            <div id="stringingContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('stringingModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GIS Modal -->
+    <div class="modal" id="gisModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">🗺️ GIS Import/Export</div>
+            <div id="gisContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('gisModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOM Modal -->
+    <div class="modal" id="bomModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">📦 Bill of Materials</div>
+            <div id="bomContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="window.exportBOMCSV?.()">Export CSV</button>
+                <button class="btn" onclick="closeModal('bomModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staking Modal -->
+    <div class="modal" id="stakingModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">📍 Staking Sheet</div>
+            <div id="stakingContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="window.printStakingSheet?.()">Print</button>
+                <button class="btn" onclick="closeModal('stakingModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Estimate Modal -->
+    <div class="modal" id="costModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">💰 Cost Estimate</div>
+            <div id="costContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('costModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Edit Modal -->
+    <div class="modal" id="bulkEditModal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-title">✏️ Bulk Edit</div>
+            <div id="bulkEditContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('bulkEditModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measure Modal -->
+    <div class="modal" id="measureModal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-title">📐 Measure Tool</div>
+            <div id="measureContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('measureModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photos Modal -->
+    <div class="modal" id="photosModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">📷 Photos</div>
+            <div id="photosContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('photosModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Selector Modal -->
+    <div class="modal" id="themesModal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-title">🎨 Theme Selector</div>
+            <div id="themesContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('themesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Versions Modal -->
+    <div class="modal" id="versionsModal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-title">📜 Version History</div>
+            <div id="versionsContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('versionsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annotations Modal -->
+    <div class="modal" id="annotationsModal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-title">✍️ Annotations</div>
+            <div id="annotationsContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('annotationsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Modal -->
+    <div class="modal" id="commentsModal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-title">💬 Comments</div>
+            <div id="commentsContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('commentsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wind Controls Modal -->
+    <div class="modal" id="windModal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-title">💨 Wind Animation</div>
+            <div id="windContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('windModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
