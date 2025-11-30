@@ -1,0 +1,37 @@
+{
+  "name": "PLA - Pole Line Analysis",
+  "short_name": "PLA",
+  "description": "3D Pole Line Analysis and Design System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "docs/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "docs/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "business"],
+  "shortcuts": [
+    {
+      "name": "Designer",
+      "url": "/docs/designer/",
+      "description": "Open PLA Designer"
+    },
+    {
+      "name": "Analysis",
+      "url": "/docs/analysis/",
+      "description": "Engineering Analysis"
+    }
+  ]
+}

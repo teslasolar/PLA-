@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLA Designer - Pole Line Analysis</title>
+    <meta name="description" content="3D Pole Line Analysis and Design System">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/docs/assets/icon-192.png">
     <script type="importmap">
     {
         "imports": {
@@ -12,6 +16,7 @@
         }
     }
     </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -28,6 +33,9 @@
         <!-- Main Canvas Area -->
         <div class="main-area">
             <div class="toolbar">
+                <button class="btn" id="undoBtn" onclick="window.undo?.()" title="Undo (Ctrl+Z)" disabled>↶</button>
+                <button class="btn" id="redoBtn" onclick="window.redo?.()" title="Redo (Ctrl+Y)" disabled>↷</button>
+                <div class="toolbar-separator"></div>
                 <button class="btn active" id="selectBtn" onclick="setTool('select')">Select</button>
                 <button class="btn" id="spanBtn" onclick="setTool('span')">Span</button>
                 <button class="btn" id="guyBtn" onclick="setTool('guy')">Guy</button>
@@ -35,10 +43,14 @@
                 <button class="btn" onclick="zoomIn()">+</button>
                 <button class="btn" onclick="zoomOut()">-</button>
                 <button class="btn" onclick="resetView()">Reset</button>
+                <button class="btn" onclick="window.toggleMap?.()" title="Toggle Map">Map</button>
                 <div class="toolbar-separator"></div>
                 <button class="btn" onclick="runAnalysis()">Analyze</button>
+                <button class="btn" onclick="window.showSagModal?.()">Sag</button>
                 <button class="btn" onclick="showReport()">Report</button>
+                <button class="btn" onclick="window.generatePDF?.()" title="Export PDF">PDF</button>
                 <div style="flex:1"></div>
+                <button class="btn" onclick="window.showShortcuts?.()" title="Keyboard Shortcuts (?)">?</button>
                 <button class="btn success" onclick="saveProject()">Save</button>
                 <button class="btn" onclick="loadProject()">Load</button>
                 <button class="btn" onclick="exportProject()">Export</button>
@@ -49,7 +61,12 @@
                     <div class="grid" id="grid"></div>
                     <div id="viewer3d"></div>
                 </div>
+                <!-- Map Overlay -->
+                <div id="mapContainer" class="map-overlay" style="display:none;"></div>
             </div>
+
+            <!-- Loading District Selector -->
+            <div id="loadingSelector" class="loading-panel"></div>
 
             <div class="status-bar">
                 <span>Poles: <strong id="poleCount">0</strong></span>
@@ -109,7 +126,39 @@
         </div>
     </div>
 
+    <!-- Sag-Tension Modal -->
+    <div class="modal" id="sagModal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-title">📐 Sag-Tension Calculator</div>
+            <div id="sagContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('sagModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal" id="shortcutsModal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-title">⌨️ Keyboard Shortcuts</div>
+            <div id="shortcutsList" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('shortcutsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <!-- Main script loads all modules -->
     <script type="module" src="scripts/main.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

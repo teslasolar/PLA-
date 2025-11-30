@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA - Offline</title>
+    <style>
+        :root { --bg: #1f2937; --txt: #e2e8f0; --acc: #60a5fa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .container { text-align: center; padding: 2rem; max-width: 500px; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        p { color: #94a3b8; margin-bottom: 1.5rem; }
+        .btn { background: var(--acc); color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #3b82f6; }
+        .features { text-align: left; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-top: 1.5rem; }
+        .features h3 { font-size: 0.9rem; color: var(--acc); margin-bottom: 0.5rem; }
+        .features li { font-size: 0.85rem; color: #94a3b8; margin-left: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>PLA requires an internet connection for some features, but you can still work with cached data.</p>
+        <button class="btn" onclick="location.reload()">Try Again</button>
+        <a href="/docs/designer/" class="btn" style="margin-left:0.5rem">Open Designer</a>
+
+        <div class="features">
+            <h3>Available Offline:</h3>
+            <ul>
+                <li>Designer interface</li>
+                <li>Previously loaded projects</li>
+                <li>Engineering specs</li>
+                <li>Analysis calculations</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        // Check connection and redirect when online
+        window.addEventListener('online', () => location.reload());
+    </script>
+</body>
+</html>

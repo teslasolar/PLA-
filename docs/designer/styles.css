@@ -83,3 +83,25 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:10000}
 .modal-content{background:rgba(31,41,55,.98);border:1px solid rgba(59,130,246,.3);border-radius:6px;padding:1.2rem;max-width:550px;width:90%;max-height:75vh;overflow-y:auto}
 .modal-title{color:var(--acc);font-size:1.1rem;margin-bottom:.8rem}
+
+/* Map Overlay */
+.map-overlay{position:absolute;inset:0;z-index:100;background:#1f2937}
+.map-overlay .leaflet-container{width:100%;height:100%;background:#1f2937}
+
+/* Loading Panel */
+.loading-panel{position:absolute;bottom:36px;left:10px;background:rgba(31,41,55,.95);border:1px solid var(--bdr);border-radius:6px;padding:.5rem .75rem;z-index:50;display:flex;align-items:center;gap:.5rem;font-size:.75rem}
+.loading-panel select{background:var(--bg3);color:var(--txt);border:1px solid var(--bdr);border-radius:4px;padding:.25rem .4rem;font-size:.7rem}
+.loading-panel .loading-info{color:var(--txt2);font-size:.65rem}
+
+/* Sag Table */
+.sag-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-top:.75rem}
+.sag-table th,.sag-table td{border:1px solid var(--bdr);padding:.4rem .5rem;text-align:center}
+.sag-table th{background:rgba(59,130,246,.2);color:var(--acc)}
+.sag-table tr:nth-child(even){background:rgba(0,0,0,.2)}
+
+/* Shortcuts */
+.shortcut-item{display:flex;justify-content:space-between;padding:.35rem .5rem;background:rgba(0,0,0,.2);border-radius:4px;font-size:.75rem}
+.shortcut-key{background:var(--bg3);padding:.1rem .4rem;border-radius:3px;font-family:monospace;color:var(--acc)}
+
+/* Disabled button */
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
