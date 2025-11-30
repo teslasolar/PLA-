@@ -81,7 +81,7 @@ export function getShortcutList() {
 }
 
 // Show shortcuts modal
-export function showShortcutsHelp() {
+export function showShortcuts() {
     const list = getShortcutList();
     const html = `
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0.5rem;font-size:0.85rem">
@@ -92,11 +92,14 @@ export function showShortcutsHelp() {
         </div>
     `;
 
+    const container = document.getElementById('shortcutsList');
+    if (container) container.innerHTML = html;
+
     const modal = document.getElementById('shortcutsModal');
-    if (modal) {
-        modal.querySelector('.modal-body').innerHTML = html;
-        modal.style.display = 'flex';
-    }
+    if (modal) modal.style.display = 'flex';
 }
 
-export default { initShortcuts, getShortcutList, showShortcutsHelp };
+// Alias for backwards compatibility
+export const showShortcutsHelp = showShortcuts;
+
+export default { initShortcuts, getShortcutList, showShortcuts };

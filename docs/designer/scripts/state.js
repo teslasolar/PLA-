@@ -47,6 +47,16 @@ export function notify(key, value) {
     }
 }
 
+// Full state access for new modules
+export function getState() {
+    return state;
+}
+
+export function setState(newState) {
+    Object.assign(state, newState);
+    notify('update', state);
+}
+
 // State getters
 export function getPole(id) {
     return state.poles.find(p => p.id === id);
