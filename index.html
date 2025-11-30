@@ -5,39 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLA - Pole Line Analysis</title>
     <style>
-        :root { --p: #2563eb; --d: #1f2937; --l: #f3f4f6; }
+        :root { --p: #2563eb; --d: #1f2937; --l: #f3f4f6; --ok: #10b981; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: var(--d); color: #fff; min-height: 100vh; }
         .hero { text-align: center; padding: 4rem 2rem; background: linear-gradient(135deg, #1e3a5f, #0f172a); }
-        h1 { font-size: 3rem; margin-bottom: 1rem; }
+        h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+        .version { display: inline-block; background: var(--ok); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
         .subtitle { opacity: 0.8; font-size: 1.25rem; margin-bottom: 2rem; }
         .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: -2rem auto 2rem; padding: 0 2rem; }
         .nav-card { background: #1e293b; border-radius: 12px; padding: 2rem; text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s; }
         .nav-card:hover { transform: translateY(-4px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .nav-card.featured { border: 2px solid #60a5fa; background: linear-gradient(135deg, #1e293b, #1e3a5f); }
         .nav-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-        .nav-card p { opacity: 0.7; font-size: 0.9rem; }
+        .nav-card p { opacity: 0.7; font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .nav-card .features { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .nav-card .tag { background: rgba(96,165,250,0.2); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; color: #60a5fa; }
         .stats { display: flex; justify-content: center; gap: 3rem; padding: 2rem; flex-wrap: wrap; }
         .stat { text-align: center; }
         .stat-val { font-size: 2rem; font-weight: bold; color: #60a5fa; }
         .stat-lbl { font-size: 0.8rem; opacity: 0.6; }
+        .section-title { text-align: center; margin: 2rem 0 1rem; font-size: 1.2rem; opacity: 0.6; }
         footer { text-align: center; padding: 2rem; opacity: 0.5; font-size: 0.8rem; }
     </style>
 </head>
 <body>
     <div class="hero">
         <h1>🔌 PLA System</h1>
-        <p class="subtitle">Pole Line Analysis | 3D Engineering | CPU+GPU Compute</p>
+        <span class="version">v4.0</span>
+        <p class="subtitle">Pole Line Analysis | 3D Engineering | 27 Feature Modules</p>
         <div class="stats">
-            <div class="stat"><div class="stat-val">WebGPU</div><div class="stat-lbl">GPU Compute</div></div>
-            <div class="stat"><div class="stat-val">16-dim</div><div class="stat-lbl">FemtoLLM</div></div>
-            <div class="stat"><div class="stat-val">1000³</div><div class="stat-lbl">Block Array</div></div>
+            <div class="stat"><div class="stat-val">27</div><div class="stat-lbl">Feature Modules</div></div>
             <div class="stat"><div class="stat-val">3D</div><div class="stat-lbl">Visualization</div></div>
+            <div class="stat"><div class="stat-val">9</div><div class="stat-lbl">Engineering Calcs</div></div>
+            <div class="stat"><div class="stat-val">PWA</div><div class="stat-lbl">Offline Ready</div></div>
         </div>
     </div>
+
     <nav class="nav-grid">
-        <a href="docs/designer/" class="nav-card" style="border: 2px solid #60a5fa;">
-            <h2>🎯 PLA Designer</h2>
-            <p>Drag-and-drop pole line design with 3D view, structural analysis, and export</p>
+        <a href="docs/designer/" class="nav-card featured">
+            <h2>🎯 PLA Designer v4.0</h2>
+            <p>Full-featured pole line design with 3D view, analysis, and project management</p>
+            <div class="features">
+                <span class="tag">Dashboard</span>
+                <span class="tag">Voltage Drop</span>
+                <span class="tag">Fault Current</span>
+                <span class="tag">Ruling Span</span>
+                <span class="tag">Transformer Sizing</span>
+                <span class="tag">Inspections</span>
+                <span class="tag">Progress Tracking</span>
+            </div>
         </a>
         <a href="docs/" class="nav-card">
             <h2>📱 Application</h2>
@@ -51,6 +67,10 @@
             <h2>⚡ Core Modules</h2>
             <p>eVGPU, WebGPU, FemtoLLM, BlockArray, and compute engines</p>
         </a>
+    </nav>
+
+    <h3 class="section-title">Engineering & Analysis Tools</h3>
+    <nav class="nav-grid">
         <a href="docs/viz/" class="nav-card">
             <h2>🎨 Visualization</h2>
             <p>Three.js 3D rendering for poles, conductors, and infrastructure</p>
@@ -68,6 +88,7 @@
             <p>API reference, examples, and NESC/engineering standards</p>
         </a>
     </nav>
-    <footer>PLA System v1.0 | No Server Required | Runs on GitHub Pages</footer>
+
+    <footer>PLA System v4.0 | No Server Required | PWA Offline Support | GitHub Pages</footer>
 </body>
 </html>
