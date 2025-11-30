@@ -23,8 +23,28 @@
     <div class="root">
         <!-- Left Sidebar - Component Palette -->
         <div class="sidebar">
-            <div class="sidebar-title">🔌 PLA Designer</div>
-            <input class="input" placeholder="Search components..." id="search" style="margin-bottom: 1rem;">
+            <div class="sidebar-title">
+                <a href="../" style="text-decoration:none;color:inherit;">🔌 PLA Designer</a>
+                <span class="version-badge">v4.0</span>
+            </div>
+
+            <!-- Quick Features Panel -->
+            <div class="features-panel">
+                <div class="feature-row">
+                    <button class="feature-btn" onclick="window.showTemplates?.()" title="Templates">📋</button>
+                    <button class="feature-btn" onclick="window.showClearances?.()" title="Clearances">📏</button>
+                    <button class="feature-btn" onclick="window.showBOM?.()" title="Bill of Materials">📦</button>
+                    <button class="feature-btn" onclick="window.showCost?.()" title="Cost Estimate">💰</button>
+                </div>
+                <div class="feature-row">
+                    <button class="feature-btn" onclick="window.showGIS?.()" title="GIS Import/Export">🗺️</button>
+                    <button class="feature-btn" onclick="window.showStaking?.()" title="Staking Sheet">📍</button>
+                    <button class="feature-btn" onclick="window.showPhotos?.()" title="Photos">📷</button>
+                    <button class="feature-btn" onclick="window.showComments?.()" title="Comments">💬</button>
+                </div>
+            </div>
+
+            <input class="input" placeholder="Search components... (Ctrl+K)" id="search" style="margin-bottom: 1rem;">
             <div id="palette">
                 <!-- Loaded from palette.json -->
             </div>
@@ -36,26 +56,78 @@
                 <button class="btn" id="undoBtn" onclick="window.undo?.()" title="Undo (Ctrl+Z)" disabled>↶</button>
                 <button class="btn" id="redoBtn" onclick="window.redo?.()" title="Redo (Ctrl+Y)" disabled>↷</button>
                 <div class="toolbar-separator"></div>
+
+                <!-- Tools -->
                 <button class="btn active" id="selectBtn" onclick="setTool('select')">Select</button>
                 <button class="btn" id="spanBtn" onclick="setTool('span')">Span</button>
                 <button class="btn" id="guyBtn" onclick="setTool('guy')">Guy</button>
+                <button class="btn" id="measureBtn" onclick="window.showMeasure?.()">Measure</button>
                 <div class="toolbar-separator"></div>
-                <button class="btn" onclick="zoomIn()">+</button>
-                <button class="btn" onclick="zoomOut()">-</button>
-                <button class="btn" onclick="resetView()">Reset</button>
-                <button class="btn" onclick="window.toggleMap?.()" title="Toggle Map">Map</button>
+
+                <!-- View -->
+                <button class="btn" onclick="zoomIn()" title="Zoom In">+</button>
+                <button class="btn" onclick="zoomOut()" title="Zoom Out">-</button>
+                <button class="btn" onclick="resetView()" title="Reset View">⌂</button>
+                <button class="btn" onclick="window.toggleMap?.()" title="Toggle Map (M)">🗺️</button>
+                <button class="btn" onclick="window.toggleWind?.()" title="Toggle Wind">💨</button>
                 <div class="toolbar-separator"></div>
-                <button class="btn" onclick="runAnalysis()">Analyze</button>
-                <button class="btn" onclick="window.showSagModal?.()">Sag</button>
-                <button class="btn" onclick="showReport()">Report</button>
-                <button class="btn" onclick="window.generatePDF?.()" title="Export PDF">PDF</button>
-                <div class="toolbar-separator"></div>
-                <button class="btn" onclick="window.showDashboard?.()" title="Dashboard">Dashboard</button>
+
+                <!-- Analysis Dropdown -->
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle">Analysis ▾</button>
+                    <div class="dropdown-menu">
+                        <a onclick="runAnalysis()">📊 Run Analysis</a>
+                        <a onclick="window.showSagModal?.()">📐 Sag-Tension</a>
+                        <a onclick="window.showClearances?.()">📏 Clearances</a>
+                        <a onclick="window.showLoadingDiagram?.()">📊 Loading Diagram</a>
+                        <a onclick="window.showGuyingCalc?.()">🔗 Guying Calculator</a>
+                        <a onclick="window.showStringing?.()">🧵 Stringing Chart</a>
+                        <div class="dropdown-divider"></div>
+                        <a onclick="window.showRulingSpanDialog?.()">📏 Ruling Span</a>
+                        <a onclick="window.showVoltageDropCalculator?.()">⚡ Voltage Drop</a>
+                        <a onclick="window.showTransformerSizing?.()">🔌 Transformer Sizing</a>
+                        <a onclick="window.showFaultAnalysis?.()">💥 Fault Current</a>
+                    </div>
+                </div>
+
+                <!-- Project Dropdown -->
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle">Project ▾</button>
+                    <div class="dropdown-menu">
+                        <a onclick="window.showDashboard?.()">📊 Dashboard</a>
+                        <a onclick="window.showProgressDialog?.()">📈 Progress</a>
+                        <a onclick="window.showInspectionDialog?.()">🔍 Inspections</a>
+                        <div class="dropdown-divider"></div>
+                        <a onclick="window.showTerrainDialog?.()">🏔️ Terrain</a>
+                        <a onclick="window.showObstaclesDialog?.()">🌳 Obstacles</a>
+                        <div class="dropdown-divider"></div>
+                        <a onclick="window.showVersions?.()">📜 Version History</a>
+                        <a onclick="window.showAnnotations?.()">✍️ Annotations</a>
+                    </div>
+                </div>
+
+                <!-- Export Dropdown -->
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle">Export ▾</button>
+                    <div class="dropdown-menu">
+                        <a onclick="window.generatePDF?.()">📄 PDF Report</a>
+                        <a onclick="exportReport()">📝 Text Report</a>
+                        <a onclick="exportProject()">💾 JSON Project</a>
+                        <div class="dropdown-divider"></div>
+                        <a onclick="window.exportKML?.()">🌍 KML (Google Earth)</a>
+                        <a onclick="window.exportGeoJSON?.()">🗺️ GeoJSON</a>
+                        <a onclick="window.exportBOMCSV?.()">📦 BOM CSV</a>
+                    </div>
+                </div>
+
                 <div style="flex:1"></div>
-                <button class="btn" onclick="window.showShortcuts?.()" title="Keyboard Shortcuts (?)">?</button>
-                <button class="btn success" onclick="saveProject()">Save</button>
+
+                <!-- Right side -->
+                <button class="btn" onclick="window.showThemes?.()" title="Theme">🎨</button>
+                <button class="btn" onclick="window.showShortcuts?.()" title="Shortcuts (?)">⌨️</button>
+                <div class="toolbar-separator"></div>
+                <button class="btn success" onclick="saveProject()" title="Save (Ctrl+S)">💾 Save</button>
                 <button class="btn" onclick="loadProject()">Load</button>
-                <button class="btn" onclick="exportProject()">Export</button>
             </div>
 
             <div class="canvas-container">
