@@ -127,7 +127,7 @@ Three.js-based rendering engine.
 - Interactive controls (OrbitControls)
 - Object selection (raycasting)
 
-**Location:** `visualization/three-scene.js`
+**Location:** `viz/scene.js`
 
 ```javascript
 class PLAScene {
@@ -248,25 +248,43 @@ User Input
 ## File Structure
 
 ```
-docs/
-├── index.html              # Entry point
-├── core/
-│   ├── pla-system.js       # Main coordinator
-│   ├── evgpu.js            # CPU compute
-│   ├── femto-llm.js        # AI model
-│   ├── catenary.js         # Sag-tension
-│   ├── pole-analysis.js    # Structural
-│   └── block-array.js      # 3D grid + Cube
-├── visualization/
-│   └── three-scene.js      # 3D rendering
-├── sandbox/
-│   └── python-runner.html  # Pyodide sandbox
-├── assets/
-│   └── css/style.css
-└── docs/
-    ├── api/
-    ├── reference/
-    └── examples/
+/                           # Root landing page
+├── index.html              # Main entry (links to docs/)
+├── docs/                   # Application folder
+│   ├── index.html          # OS Desktop hub
+│   ├── designer/           # PLA Designer v4.0
+│   │   ├── index.html      # Main designer app
+│   │   ├── styles.css      # Designer styles
+│   │   └── scripts/        # 27 feature modules
+│   │       ├── main.js     # Entry point
+│   │       ├── state.js    # State management
+│   │       ├── poles.js    # Pole operations
+│   │       ├── spans.js    # Span/conductor ops
+│   │       └── ...         # Analysis, templates, etc.
+│   ├── core/               # Core computation modules
+│   │   ├── pla-system.js   # Main coordinator
+│   │   ├── evgpu.js        # CPU compute engine
+│   │   ├── catenary.js     # Sag-tension math
+│   │   ├── pole-analysis.js# Structural analysis
+│   │   └── init.js         # System initialization
+│   ├── viz/                # 3D visualization
+│   │   ├── scene.js        # Three.js scene setup
+│   │   ├── pole-mesh.js    # Pole geometry
+│   │   ├── conductor-mesh.js # Catenary rendering
+│   │   └── controls.js     # Camera controls
+│   ├── analysis/           # Analysis calculators
+│   │   └── index.html      # Analysis tools UI
+│   ├── sandbox/            # Python sandbox
+│   │   ├── index.html      # Sandbox UI
+│   │   └── python-runner.html # Pyodide runner
+│   ├── llm/                # Browser AI
+│   │   └── index.html      # LLM interface
+│   ├── docs/               # Documentation
+│   │   ├── api/            # API reference
+│   │   ├── reference/      # NESC standards
+│   │   └── examples/       # Code examples
+│   └── assets/
+│       └── css/base.css    # Shared OS styles
 ```
 
 ## Extension Points
