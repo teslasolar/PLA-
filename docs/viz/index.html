@@ -6,46 +6,59 @@
     <title>PLA Visualization</title>
     <link rel="stylesheet" href="../assets/css/base.css">
 </head>
-<body>
+<body class="os-shell">
     <nav class="topnav">
-        <a href="../../" class="logo">🔌 PLA</a>
+        <a href="../../" class="logo">🔌 PLA OS</a>
         <div class="nav-links">
-            <a href="../">App</a>
+            <a href="../">Desktop</a>
+            <a href="../designer/">Designer</a>
             <a href="../core/">Core</a>
-            <a href="./">Viz</a>
+            <a href="./" class="active">Viz</a>
             <a href="../analysis/">Analysis</a>
-            <a href="../sandbox/">Sandbox</a>
+            <a href="../llm/">AI</a>
+            <a href="../sandbox/">Python</a>
+            <a href="../docs/">Docs</a>
         </div>
     </nav>
-    <main>
-        <h1>🎨 Visualization Modules</h1>
-        <p>Three.js 3D rendering for power line infrastructure.</p>
-        <div class="index-grid">
-            <a href="scene.js" class="index-card">
-                <h3>scene.js</h3>
-                <p>Main Three.js scene setup and management</p>
-            </a>
-            <a href="pole-mesh.js" class="index-card">
-                <h3>pole-mesh.js</h3>
-                <p>Pole geometry and materials</p>
-            </a>
-            <a href="conductor-mesh.js" class="index-card">
-                <h3>conductor-mesh.js</h3>
-                <p>Catenary conductor rendering</p>
-            </a>
-            <a href="controls.js" class="index-card">
-                <h3>controls.js</h3>
-                <p>Camera and interaction controls</p>
-            </a>
-            <a href="labels.js" class="index-card">
-                <h3>labels.js</h3>
-                <p>Text labels and annotations</p>
-            </a>
-            <a href="export.js" class="index-card">
-                <h3>export.js</h3>
-                <p>Scene export and screenshot</p>
-            </a>
-        </div>
-    </main>
+    <div class="os-content">
+        <main>
+            <h1>🎨 Visualization Modules</h1>
+            <p>Three.js 3D rendering for power line infrastructure.</p>
+            <div class="index-grid">
+                <a href="scene.js" class="index-card">
+                    <h3>scene.js</h3>
+                    <p>Main Three.js scene setup and management</p>
+                </a>
+                <a href="pole-mesh.js" class="index-card">
+                    <h3>pole-mesh.js</h3>
+                    <p>Pole geometry and materials</p>
+                </a>
+                <a href="conductor-mesh.js" class="index-card">
+                    <h3>conductor-mesh.js</h3>
+                    <p>Catenary conductor rendering</p>
+                </a>
+                <a href="controls.js" class="index-card">
+                    <h3>controls.js</h3>
+                    <p>Camera and interaction controls</p>
+                </a>
+                <a href="labels.js" class="index-card">
+                    <h3>labels.js</h3>
+                    <p>Text labels and annotations</p>
+                </a>
+                <a href="export.js" class="index-card">
+                    <h3>export.js</h3>
+                    <p>Scene export and screenshot</p>
+                </a>
+            </div>
+        </main>
+    </div>
+    <div class="dock">
+        <a href="../designer/" class="dock-item"><span class="dock-tooltip">Designer</span>🎯</a>
+        <a href="./" class="dock-item active"><span class="dock-tooltip">3D Viewer</span>🎨</a>
+        <a href="../analysis/" class="dock-item"><span class="dock-tooltip">Analysis</span>📐</a>
+        <a href="../sandbox/" class="dock-item"><span class="dock-tooltip">Python</span>🐍</a>
+        <a href="../llm/" class="dock-item"><span class="dock-tooltip">AI</span>🤖</a>
+        <a href="../docs/" class="dock-item"><span class="dock-tooltip">Docs</span>📚</a>
+    </div>
 </body>
 </html>

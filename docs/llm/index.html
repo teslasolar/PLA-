@@ -7,81 +7,96 @@
     <link rel="stylesheet" href="../assets/css/base.css">
     <style>
         .model-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
-        .model-card { background: #1e293b; padding: 1rem; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-        .model-card:hover { border-color: #3b82f6; }
-        .model-card.active { border-color: #22c55e; background: #1a3a2a; }
+        .model-card { background: rgba(30,41,59,0.8); padding: 1rem; border-radius: 8px; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s; }
+        .model-card:hover { border-color: #3b82f6; transform: translateY(-2px); }
+        .model-card.active { border-color: #22c55e; background: rgba(26,58,42,0.8); }
         .model-card h3 { margin: 0 0 0.5rem 0; }
         .model-card .size { color: #60a5fa; font-size: 0.9rem; }
         .model-card .desc { opacity: 0.7; font-size: 0.85rem; }
-        .chat { background: #1e1e1e; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .chat { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; border: 1px solid rgba(255,255,255,0.1); }
         #messages { height: 300px; overflow-y: auto; margin-bottom: 1rem; }
-        .msg { padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px; }
+        .msg { padding: 0.75rem 1rem; margin: 0.5rem 0; border-radius: 8px; }
         .msg.user { background: #2563eb; margin-left: 20%; }
-        .msg.bot { background: #374151; margin-right: 20%; }
+        .msg.bot { background: rgba(55,65,81,0.8); margin-right: 20%; }
         .input-row { display: flex; gap: 0.5rem; }
-        .input-row input { flex: 1; padding: 0.75rem; border: 0; border-radius: 4px; background: #374151; color: #fff; }
-        .progress { background: #333; border-radius: 4px; height: 8px; margin: 0.5rem 0; overflow: hidden; }
+        .input-row input { flex: 1; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; }
+        .input-row input:focus { outline: none; border-color: #3b82f6; }
+        .progress { background: rgba(0,0,0,0.3); border-radius: 4px; height: 8px; margin: 0.5rem 0; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #22c55e); transition: width 0.3s; }
-        #status { padding: 0.5rem; background: #333; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+        #status { padding: 0.75rem; background: rgba(0,0,0,0.3); border-radius: 8px; font-family: monospace; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); }
+        .card { background: rgba(30,41,59,0.8); border-radius: 8px; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); }
+        .card input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; }
     </style>
 </head>
-<body>
+<body class="os-shell">
     <nav class="topnav">
-        <a href="../../" class="logo">🔌 PLA</a>
+        <a href="../../" class="logo">🔌 PLA OS</a>
         <div class="nav-links">
-            <a href="../">App</a>
+            <a href="../">Desktop</a>
+            <a href="../designer/">Designer</a>
             <a href="../core/">Core</a>
             <a href="../viz/">Viz</a>
             <a href="../analysis/">Analysis</a>
-            <a href="./">LLM</a>
-            <a href="../sandbox/">Sandbox</a>
+            <a href="./" class="active">AI</a>
+            <a href="../sandbox/">Python</a>
+            <a href="../docs/">Docs</a>
         </div>
     </nav>
-    <main>
-        <h1>Browser LLM</h1>
-        <p>Run AI models entirely in your browser. Models are cached after first download.</p>
+    <div class="os-content">
+        <main>
+            <h1>🤖 Browser LLM</h1>
+            <p>Run AI models entirely in your browser. Models are cached after first download.</p>
 
-        <h2>Select Model</h2>
-        <div class="model-cards">
-            <div class="model-card" data-model="distilgpt2" onclick="selectModel('distilgpt2')">
-                <h3>DistilGPT2</h3>
-                <div class="size">~80MB</div>
-                <div class="desc">Text generation</div>
+            <h2>Select Model</h2>
+            <div class="model-cards">
+                <div class="model-card" data-model="distilgpt2" onclick="selectModel('distilgpt2')">
+                    <h3>DistilGPT2</h3>
+                    <div class="size">~80MB</div>
+                    <div class="desc">Text generation</div>
+                </div>
+                <div class="model-card" data-model="t5small" onclick="selectModel('t5small')">
+                    <h3>Flan-T5 Small</h3>
+                    <div class="size">~77MB</div>
+                    <div class="desc">Instruction following</div>
+                </div>
+                <div class="model-card active" data-model="minilm" onclick="selectModel('minilm')">
+                    <h3>MiniLM-L6</h3>
+                    <div class="size">~23MB</div>
+                    <div class="desc">Embeddings + PLA Q&A</div>
+                </div>
             </div>
-            <div class="model-card" data-model="t5small" onclick="selectModel('t5small')">
-                <h3>Flan-T5 Small</h3>
-                <div class="size">~77MB</div>
-                <div class="desc">Instruction following</div>
-            </div>
-            <div class="model-card active" data-model="minilm" onclick="selectModel('minilm')">
-                <h3>MiniLM-L6</h3>
-                <div class="size">~23MB</div>
-                <div class="desc">Embeddings + PLA Q&A</div>
-            </div>
-        </div>
 
-        <div id="status">Select a model and click Load</div>
-        <div class="progress"><div class="progress-bar" id="progress" style="width: 0%"></div></div>
-        <button class="btn" id="loadBtn" onclick="loadModel()">Load Model</button>
+            <div id="status">Select a model and click Load</div>
+            <div class="progress"><div class="progress-bar" id="progress" style="width: 0%"></div></div>
+            <button class="btn" id="loadBtn" onclick="loadModel()">Load Model</button>
 
-        <h2>Chat</h2>
-        <div class="chat">
-            <div id="messages"></div>
-            <div class="input-row">
-                <input type="text" id="input" placeholder="Ask about pole line analysis..." disabled>
-                <button class="btn" id="sendBtn" onclick="send()" disabled>Send</button>
+            <h2>Chat</h2>
+            <div class="chat">
+                <div id="messages"></div>
+                <div class="input-row">
+                    <input type="text" id="input" placeholder="Ask about pole line analysis..." disabled>
+                    <button class="btn" id="sendBtn" onclick="send()" disabled>Send</button>
+                </div>
             </div>
-        </div>
 
-        <h2>Similarity Demo</h2>
-        <div class="card">
-            <p>Compare semantic similarity between two texts (requires MiniLM):</p>
-            <input type="text" id="sim1" value="Calculate the sag of a 50m span" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
-            <input type="text" id="sim2" value="What is the catenary tension?" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
-            <button class="btn" onclick="compareSim()">Compare</button>
-            <div id="simResult" style="margin-top:0.5rem; font-family:monospace;"></div>
-        </div>
-    </main>
+            <h2>Similarity Demo</h2>
+            <div class="card">
+                <p>Compare semantic similarity between two texts (requires MiniLM):</p>
+                <input type="text" id="sim1" value="Calculate the sag of a 50m span" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
+                <input type="text" id="sim2" value="What is the catenary tension?" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
+                <button class="btn" onclick="compareSim()">Compare</button>
+                <div id="simResult" style="margin-top:0.5rem; font-family:monospace;"></div>
+            </div>
+        </main>
+    </div>
+    <div class="dock">
+        <a href="../designer/" class="dock-item"><span class="dock-tooltip">Designer</span>🎯</a>
+        <a href="../viz/" class="dock-item"><span class="dock-tooltip">3D Viewer</span>🎨</a>
+        <a href="../analysis/" class="dock-item"><span class="dock-tooltip">Analysis</span>📐</a>
+        <a href="../sandbox/" class="dock-item"><span class="dock-tooltip">Python</span>🐍</a>
+        <a href="./" class="dock-item active"><span class="dock-tooltip">AI</span>🤖</a>
+        <a href="../docs/" class="dock-item"><span class="dock-tooltip">Docs</span>📚</a>
+    </div>
 
     <script type="module">
         import { initLLM, generate, similarity, PLAAssistant, MODELS } from '../core/transformers-llm.js';

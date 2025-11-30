@@ -7,33 +7,38 @@
     <link rel="stylesheet" href="../assets/css/base.css">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
     <style>
-        .sandbox { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; height: 70vh; }
-        .editor, .output { display: flex; flex-direction: column; background: #1e1e1e; border-radius: 8px; }
-        .panel-head { padding: 0.75rem 1rem; background: #333; display: flex; justify-content: space-between; }
-        #code { flex: 1; padding: 1rem; border: 0; resize: none; background: #1e1e1e; color: #d4d4d4; font-family: monospace; }
-        #out { flex: 1; padding: 1rem; color: #58a6ff; overflow: auto; white-space: pre-wrap; }
-        .examples { margin-top: 1rem; }
-        .ex-btn { margin: 0.25rem; padding: 0.5rem 1rem; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; }
+        .sandbox { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; height: 60vh; }
+        .editor, .output { display: flex; flex-direction: column; background: #0f172a; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .panel-head { padding: 0.75rem 1rem; background: rgba(0,0,0,0.3); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        #code { flex: 1; padding: 1rem; border: 0; resize: none; background: transparent; color: #e2e8f0; font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        #out { flex: 1; padding: 1rem; color: #60a5fa; overflow: auto; white-space: pre-wrap; font-family: monospace; }
+        .examples { margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .ex-btn { padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .ex-btn:hover { background: rgba(255,255,255,0.2); border-color: #3b82f6; }
     </style>
 </head>
-<body>
+<body class="os-shell">
     <nav class="topnav">
-        <a href="../../" class="logo">🔌 PLA</a>
+        <a href="../../" class="logo">🔌 PLA OS</a>
         <div class="nav-links">
-            <a href="../">App</a>
+            <a href="../">Desktop</a>
+            <a href="../designer/">Designer</a>
             <a href="../core/">Core</a>
             <a href="../viz/">Viz</a>
             <a href="../analysis/">Analysis</a>
-            <a href="./">Sandbox</a>
+            <a href="../llm/">AI</a>
+            <a href="./" class="active">Python</a>
+            <a href="../docs/">Docs</a>
         </div>
     </nav>
-    <main>
-        <h1>🐍 Python Sandbox</h1>
-        <p id="status">Loading Python...</p>
-        <div class="sandbox">
-            <div class="editor">
-                <div class="panel-head"><span>Python</span><button class="btn" onclick="run()">▶ Run</button></div>
-                <textarea id="code">import numpy as np
+    <div class="os-content">
+        <main>
+            <h1>🐍 Python Sandbox</h1>
+            <p id="status">Loading Python (Pyodide + NumPy)...</p>
+            <div class="sandbox">
+                <div class="editor">
+                    <div class="panel-head"><span>Python</span><button class="btn" onclick="run()">▶ Run</button></div>
+                    <textarea id="code">import numpy as np
 
 span = 50  # m
 sag = 2.5  # m
@@ -44,18 +49,27 @@ print(f"Span: {span}m")
 print(f"Sag: {sag}m")
 print(f"a: {a:.2f}m")
 print(f"Tension: {H:.0f}N")</textarea>
+                </div>
+                <div class="output">
+                    <div class="panel-head"><span>Output</span><button class="btn" onclick="clearOut()">Clear</button></div>
+                    <pre id="out"></pre>
+                </div>
             </div>
-            <div class="output">
-                <div class="panel-head"><span>Output</span><button class="btn" onclick="clear()">Clear</button></div>
-                <pre id="out"></pre>
+            <div class="examples">
+                <button class="ex-btn" onclick="load('cat')">Catenary</button>
+                <button class="ex-btn" onclick="load('wind')">Wind Load</button>
+                <button class="ex-btn" onclick="load('pole')">Pole Analysis</button>
             </div>
-        </div>
-        <div class="examples">
-            <button class="ex-btn" onclick="load('cat')">Catenary</button>
-            <button class="ex-btn" onclick="load('wind')">Wind Load</button>
-            <button class="ex-btn" onclick="load('pole')">Pole Analysis</button>
-        </div>
-    </main>
+        </main>
+    </div>
+    <div class="dock">
+        <a href="../designer/" class="dock-item"><span class="dock-tooltip">Designer</span>🎯</a>
+        <a href="../viz/" class="dock-item"><span class="dock-tooltip">3D Viewer</span>🎨</a>
+        <a href="../analysis/" class="dock-item"><span class="dock-tooltip">Analysis</span>📐</a>
+        <a href="./" class="dock-item active"><span class="dock-tooltip">Python</span>🐍</a>
+        <a href="../llm/" class="dock-item"><span class="dock-tooltip">AI</span>🤖</a>
+        <a href="../docs/" class="dock-item"><span class="dock-tooltip">Docs</span>📚</a>
+    </div>
     <script src="sandbox.js"></script>
 </body>
 </html>
