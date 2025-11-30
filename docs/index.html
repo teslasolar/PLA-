@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLA - Pole Line Analysis</title>
     <link rel="stylesheet" href="assets/css/base.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
+        }
+    }
+    </script>
     <style>
         .hero { background: linear-gradient(135deg, #1e3a5f, #0f172a); color: #fff; padding: 2rem; text-align: center; }
         .stats { display: flex; justify-content: center; gap: 3rem; margin-top: 1rem; flex-wrap: wrap; }

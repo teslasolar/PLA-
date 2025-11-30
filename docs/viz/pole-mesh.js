@@ -2,6 +2,8 @@
  * Pole Mesh Generator
  * Creates 3D pole geometry
  */
+import * as THREE from 'three';
+
 export class PoleMesh {
     static MATERIALS = {
         wood: { color: 0x8B4513, roughness: 0.9, metalness: 0.1 },

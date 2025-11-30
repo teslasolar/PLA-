@@ -2,6 +2,8 @@
  * Three.js Scene Manager
  * Main 3D visualization setup
  */
+import * as THREE from 'three';
+
 export class Scene {
     constructor(container) {
         this.container = container;

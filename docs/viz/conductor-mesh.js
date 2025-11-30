@@ -2,6 +2,7 @@
  * Conductor Mesh Generator
  * Creates catenary curve conductors
  */
+import * as THREE from 'three';
 import { Catenary } from '../analysis/catenary.js';
 
 export class ConductorMesh {

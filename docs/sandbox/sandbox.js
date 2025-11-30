@@ -70,13 +70,18 @@ async function run() {
     }
 }
 
-function clear() {
+function clearOutput() {
     document.getElementById('out').textContent = '';
 }
 
-function load(name) {
+function loadExample(name) {
     if (EXAMPLES[name]) document.getElementById('code').value = EXAMPLES[name];
 }
+
+// Expose to window for onclick handlers
+window.run = run;
+window.clear = clearOutput;
+window.load = loadExample;
 
 document.addEventListener('keydown', e => {
     if (e.ctrlKey && e.key === 'Enter') run();

@@ -1,6 +1,9 @@
 /**
  * Camera and Interaction Controls
  */
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 export class Controls {
     constructor(camera, domElement) {
         this.camera = camera;
@@ -13,11 +16,7 @@ export class Controls {
     }
 
     initOrbit() {
-        if (!THREE.OrbitControls) {
-            console.warn('OrbitControls not loaded');
-            return this;
-        }
-        this.orbit = new THREE.OrbitControls(this.camera, this.domElement);
+        this.orbit = new OrbitControls(this.camera, this.domElement);
         this.orbit.enableDamping = true;
         this.orbit.dampingFactor = 0.05;
         this.orbit.minDistance = 10;
