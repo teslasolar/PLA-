@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA Designer - Pole Line Analysis</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1f2937; color: #e2e8f0; height: 100vh; overflow: hidden; }
+
+        .root { display: flex; width: 100vw; height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background: rgba(31,41,55,0.95); border-right: 1px solid rgba(107,114,128,0.3); overflow-y: auto; padding: 1rem; }
+        .sidebar-title { color: #60a5fa; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; text-align: center; }
+
+        /* Main Area */
+        .main-area { flex: 1; display: flex; flex-direction: column; }
+
+        /* Toolbar */
+        .toolbar { height: 50px; background: rgba(31,41,55,0.9); border-bottom: 1px solid rgba(107,114,128,0.3); display: flex; align-items: center; padding: 0 1rem; gap: 0.5rem; flex-wrap: wrap; }
+
+        /* Canvas */
+        .canvas-container { flex: 1; position: relative; overflow: hidden; }
+        .canvas { width: 100%; height: 100%; position: relative; background: linear-gradient(135deg, #374151, #4b5563); }
+        .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(107,114,128,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(107,114,128,0.15) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+
+        /* 3D Viewer */
+        #viewer3d { position: absolute; inset: 0; }
+
+        /* Properties Panel */
+        .properties { width: 320px; background: rgba(31,41,55,0.95); border-left: 1px solid rgba(107,114,128,0.3); overflow-y: auto; padding: 1rem; }
+        .props-title { color: #60a5fa; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+
+        /* Status Bar */
+        .status-bar { height: 28px; background: rgba(31,41,55,0.9); border-top: 1px solid rgba(107,114,128,0.3); display: flex; align-items: center; padding: 0 1rem; font-size: 0.75rem; color: #94a3b8; gap: 1.5rem; }
+
+        /* Components */
+        .btn { background: linear-gradient(45deg, #4b5563, #374151); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .btn.active { background: linear-gradient(45deg, #2563eb, #1d4ed8); }
+        .btn.success { background: linear-gradient(45deg, #10b981, #059669); }
+        .btn.danger { background: linear-gradient(45deg, #ef4444, #dc2626); }
+
+        .input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 0.4rem; border-radius: 4px; font-size: 0.8rem; width: 100%; }
+        .input:focus { outline: none; border-color: #60a5fa; }
+
+        .label { color: #94a3b8; font-size: 0.75rem; margin-bottom: 0.2rem; display: block; }
+
+        /* Category */
+        .category { margin-bottom: 0.75rem; }
+        .category-header { background: rgba(107,114,128,0.1); padding: 0.5rem; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(107,114,128,0.2); }
+        .category-header:hover { background: rgba(107,114,128,0.2); }
+        .category-title { color: #9ca3af; font-size: 0.85rem; font-weight: 600; }
+        .category-count { background: rgba(59,130,246,0.3); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.65rem; }
+        .category-content { padding: 0.5rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+        .category-content.collapsed { display: none; }
+
+        /* Palette Item */
+        .item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 6px; cursor: grab; transition: all 0.2s; text-align: center; }
+        .item:hover { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.4); transform: translateY(-1px); }
+        .item:active { cursor: grabbing; }
+        .item-icon { font-size: 1.5rem; margin-bottom: 0.2rem; }
+        .item-name { font-size: 0.7rem; font-weight: 500; }
+
+        /* Form Groups */
+        .form-group { margin-bottom: 0.75rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; }
+
+        /* JSON Output */
+        .json-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(107,114,128,0.3); border-radius: 6px; padding: 0.75rem; font-family: 'Consolas', monospace; font-size: 0.7rem; color: #d1d5db; max-height: 250px; overflow: auto; white-space: pre-wrap; }
+
+        /* Notification */
+        .notification { position: fixed; top: 1rem; right: 1rem; padding: 0.75rem 1rem; border-radius: 6px; color: white; font-weight: 500; z-index: 10001; transform: translateX(400px); transition: transform 0.3s; }
+        .notification.show { transform: translateX(0); }
+        .notification.success { background: linear-gradient(45deg, #10b981, #059669); }
+        .notification.error { background: linear-gradient(45deg, #ef4444, #dc2626); }
+        .notification.info { background: linear-gradient(45deg, #3b82f6, #2563eb); }
+
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-content { background: rgba(31,41,55,0.98); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-title { color: #60a5fa; font-size: 1.2rem; margin-bottom: 1rem; }
+
+        /* Analysis Results */
+        .result-card { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.75rem; margin-bottom: 0.5rem; }
+        .result-label { font-size: 0.7rem; color: #94a3b8; }
+        .result-value { font-size: 1.1rem; font-weight: 600; color: #60a5fa; }
+        .result-value.pass { color: #10b981; }
+        .result-value.fail { color: #ef4444; }
+        .result-value.warn { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="root">
+        <!-- Left Sidebar - Component Palette -->
+        <div class="sidebar">
+            <div class="sidebar-title">🔌 PLA Designer</div>
+            <input class="input" placeholder="Search components..." id="search" style="margin-bottom: 1rem;">
+
+            <div id="palette">
+                <!-- Poles -->
+                <div class="category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-title">🪵 Poles</span>
+                        <span class="category-count">5</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="item" draggable="true" data-type="pole" data-class="2" data-material="wood">
+                            <div class="item-icon">🪵</div>
+                            <div class="item-name">Wood Class 2</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="pole" data-class="3" data-material="wood">
+                            <div class="item-icon">🪵</div>
+                            <div class="item-name">Wood Class 3</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="pole" data-class="1" data-material="wood">
+                            <div class="item-icon">🪵</div>
+                            <div class="item-name">Wood Class 1</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="pole" data-class="H1" data-material="steel">
+                            <div class="item-icon">🗼</div>
+                            <div class="item-name">Steel H1</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="pole" data-class="2" data-material="concrete">
+                            <div class="item-icon">🏛️</div>
+                            <div class="item-name">Concrete</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conductors -->
+                <div class="category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-title">⚡ Conductors</span>
+                        <span class="category-count">4</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="item" draggable="true" data-type="conductor" data-code="Raven">
+                            <div class="item-icon">〰️</div>
+                            <div class="item-name">ACSR Raven</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="conductor" data-code="Sparrow">
+                            <div class="item-icon">〰️</div>
+                            <div class="item-name">ACSR Sparrow</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="conductor" data-code="Penguin">
+                            <div class="item-icon">〰️</div>
+                            <div class="item-name">ACSR Penguin</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="conductor" data-code="Tulip">
+                            <div class="item-icon">🔵</div>
+                            <div class="item-name">AAC Tulip</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment -->
+                <div class="category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-title">⚙️ Equipment</span>
+                        <span class="category-count">4</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="item" draggable="true" data-type="transformer" data-kva="25">
+                            <div class="item-icon">🔌</div>
+                            <div class="item-name">Transformer 25kVA</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="transformer" data-kva="50">
+                            <div class="item-icon">🔌</div>
+                            <div class="item-name">Transformer 50kVA</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="fuse">
+                            <div class="item-icon">⚡</div>
+                            <div class="item-name">Fuse Cutout</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="switch">
+                            <div class="item-icon">🔀</div>
+                            <div class="item-name">Switch</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guy Wires -->
+                <div class="category">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span class="category-title">🔗 Guy Wires</span>
+                        <span class="category-count">3</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="item" draggable="true" data-type="guy" data-size="3/8">
+                            <div class="item-icon">↘️</div>
+                            <div class="item-name">3/8" EHS</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="guy" data-size="7/16">
+                            <div class="item-icon">↘️</div>
+                            <div class="item-name">7/16" EHS</div>
+                        </div>
+                        <div class="item" draggable="true" data-type="anchor">
+                            <div class="item-icon">⚓</div>
+                            <div class="item-name">Anchor</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Canvas Area -->
+        <div class="main-area">
+            <div class="toolbar">
+                <button class="btn" id="selectBtn" onclick="setTool('select')">↖️ Select</button>
+                <button class="btn" id="spanBtn" onclick="setTool('span')">〰️ Span</button>
+                <button class="btn" id="guyBtn" onclick="setTool('guy')">↘️ Guy</button>
+                <div style="border-left: 1px solid rgba(107,114,128,0.3); height: 30px; margin: 0 0.5rem;"></div>
+                <button class="btn" onclick="toggleView()">🔄 2D/3D</button>
+                <button class="btn" onclick="zoomIn()">🔍+</button>
+                <button class="btn" onclick="zoomOut()">🔍-</button>
+                <button class="btn" onclick="resetView()">↻ Reset</button>
+                <div style="border-left: 1px solid rgba(107,114,128,0.3); height: 30px; margin: 0 0.5rem;"></div>
+                <button class="btn" onclick="runAnalysis()">📊 Analyze</button>
+                <button class="btn" onclick="showReport()">📋 Report</button>
+                <div style="flex:1"></div>
+                <button class="btn success" onclick="saveProject()">💾 Save</button>
+                <button class="btn" onclick="loadProject()">📂 Load</button>
+                <button class="btn" onclick="exportProject()">📤 Export</button>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas" id="canvas">
+                    <div class="grid" id="grid"></div>
+                    <div id="viewer3d"></div>
+                    <svg id="overlay2d" style="position:absolute;inset:0;pointer-events:none;"></svg>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <span>Poles: <strong id="poleCount">0</strong></span>
+                <span>Spans: <strong id="spanCount">0</strong></span>
+                <span>Selected: <strong id="selectedName">None</strong></span>
+                <span>Tool: <strong id="currentTool">Select</strong></span>
+                <span id="status" style="color: #10b981;">Ready</span>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Properties -->
+        <div class="properties">
+            <div class="props-title">⚙️ Properties</div>
+            <div id="propsPanel">
+                <div style="color: #64748b; text-align: center; padding: 1rem;">
+                    Select a component to edit properties
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <div class="props-title">📊 Quick Analysis</div>
+                <div id="quickAnalysis">
+                    <div class="result-card">
+                        <div class="result-label">Total Line Length</div>
+                        <div class="result-value" id="totalLength">0 ft</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Max Utilization</div>
+                        <div class="result-value" id="maxUtil">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Clearance Status</div>
+                        <div class="result-value pass" id="clearanceStatus">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div class="props-title" style="margin:0;">📄 Project JSON</div>
+                    <button class="btn" onclick="copyJSON()" style="font-size:0.7rem; padding:0.25rem 0.5rem;">📋 Copy</button>
+                </div>
+                <div class="json-box" id="jsonOutput">{}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="modal" id="analysisModal">
+        <div class="modal-content">
+            <div class="modal-title">📊 Structural Analysis Report</div>
+            <div id="analysisResults"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('analysisModal')">Close</button>
+                <button class="btn success" onclick="exportReport()">📤 Export PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // ===== State =====
+        const state = {
+            poles: [],
+            spans: [],
+            guys: [],
+            equipment: [],
+            selected: null,
+            tool: 'select',
+            view3d: true,
+            spanStart: null,
+            poleCounter: 0,
+            spanCounter: 0
+        };
+
+        // ===== Three.js Setup =====
+        let scene, camera, renderer, controls;
+        const objects = new Map();
+
+        function initThree() {
+            const container = document.getElementById('viewer3d');
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 200, 1000);
+
+            camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 2000);
+            camera.position.set(150, 80, 150);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(w, h);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.target.set(0, 15, 0);
+
+            // Lights
+            scene.add(new THREE.AmbientLight(0x404040, 1));
+            const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+            sun.position.set(100, 150, 100);
+            sun.castShadow = true;
+            scene.add(sun);
+            scene.add(new THREE.HemisphereLight(0x87CEEB, 0x8B7355, 0.5));
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(1000, 1000),
+                new THREE.MeshStandardMaterial({ color: 0x228B22, roughness: 0.9 })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Grid
+            scene.add(new THREE.GridHelper(500, 50, 0x444444, 0x666666));
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
+            });
+
+            // Click handler for selection
+            renderer.domElement.addEventListener('click', onCanvasClick);
+        }
+
+        // ===== Pole Creation =====
+        const POLE_CLASSES = {
+            'H6': { capacity: 19800, height: 75 },
+            'H5': { capacity: 16000, height: 70 },
+            'H1': { capacity: 6400, height: 55 },
+            '1': { capacity: 4500, height: 45 },
+            '2': { capacity: 3700, height: 45 },
+            '3': { capacity: 3000, height: 40 }
+        };
+
+        const MATERIALS = {
+            wood: { color: 0x8B4513, roughness: 0.9 },
+            steel: { color: 0xC0C0C0, roughness: 0.3, metalness: 0.7 },
+            concrete: { color: 0x808080, roughness: 0.8 }
+        };
+
+        function createPole(x, z, poleClass = '2', material = 'wood') {
+            const id = `pole_${++state.poleCounter}`;
+            const classData = POLE_CLASSES[poleClass] || POLE_CLASSES['2'];
+            const height = classData.height * 0.3048; // ft to m
+
+            const group = new THREE.Group();
+            group.userData = { id, type: 'pole', poleClass, material, height: classData.height, capacity: classData.capacity };
+
+            // Main pole
+            const geo = new THREE.CylinderGeometry(0.15, 0.25, height, 16);
+            const mat = new THREE.MeshStandardMaterial(MATERIALS[material]);
+            const pole = new THREE.Mesh(geo, mat);
+            pole.position.y = height / 2;
+            pole.castShadow = true;
+            group.add(pole);
+
+            // Crossarm
+            const armGeo = new THREE.BoxGeometry(4, 0.15, 0.15);
+            const armMat = new THREE.MeshStandardMaterial({ color: 0x654321 });
+            const arm = new THREE.Mesh(armGeo, armMat);
+            arm.position.y = height * 0.9;
+            arm.castShadow = true;
+            group.add(arm);
+
+            group.position.set(x, 0, z);
+            scene.add(group);
+            objects.set(id, group);
+
+            state.poles.push({
+                id, x, z, poleClass, material,
+                height: classData.height,
+                capacity: classData.capacity,
+                loads: []
+            });
+
+            updateUI();
+            return id;
+        }
+
+        // ===== Span Creation =====
+        function createSpan(pole1Id, pole2Id, phases = 3, sag = 2.5) {
+            const p1 = state.poles.find(p => p.id === pole1Id);
+            const p2 = state.poles.find(p => p.id === pole2Id);
+            if (!p1 || !p2) return;
+
+            const id = `span_${++state.spanCounter}`;
+            const spanLength = Math.sqrt((p2.x - p1.x)**2 + (p2.z - p1.z)**2);
+
+            const group = new THREE.Group();
+            group.userData = { id, type: 'span', pole1: pole1Id, pole2: pole2Id, phases, sag, length: spanLength };
+
+            const h1 = p1.height * 0.3048 * 0.9;
+            const h2 = p2.height * 0.3048 * 0.9;
+
+            // Create conductors for each phase
+            for (let phase = 0; phase < phases; phase++) {
+                const offset = (phase - (phases-1)/2) * 1.2;
+                const conductor = createConductor(
+                    { x: p1.x, y: h1, z: p1.z + offset },
+                    { x: p2.x, y: h2, z: p2.z + offset },
+                    sag
+                );
+                group.add(conductor);
+            }
+
+            scene.add(group);
+            objects.set(id, group);
+
+            state.spans.push({
+                id, pole1: pole1Id, pole2: pole2Id,
+                length: spanLength, phases, sag,
+                conductor: 'Raven'
+            });
+
+            updateUI();
+            return id;
+        }
+
+        function createConductor(start, end, sag) {
+            const span = Math.sqrt((end.x - start.x)**2 + (end.z - start.z)**2);
+            const segments = 30;
+            const points = [];
+
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const x = start.x + (end.x - start.x) * t;
+                const z = start.z + (end.z - start.z) * t;
+                // Catenary approximation
+                const sagY = -sag * 4 * t * (1 - t);
+                const y = start.y + (end.y - start.y) * t + sagY;
+                points.push(new THREE.Vector3(x, y, z));
+            }
+
+            const curve = new THREE.CatmullRomCurve3(points);
+            const geo = new THREE.TubeGeometry(curve, segments, 0.02, 8, false);
+            const mat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.7, roughness: 0.3 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.castShadow = true;
+            return mesh;
+        }
+
+        // ===== Selection =====
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onCanvasClick(e) {
+            if (state.tool !== 'select' && state.tool !== 'span') return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const meshes = [];
+            objects.forEach(obj => obj.traverse(c => { if (c.isMesh) meshes.push(c); }));
+            const hits = raycaster.intersectObjects(meshes);
+
+            if (hits.length > 0) {
+                let obj = hits[0].object;
+                while (obj.parent && !obj.userData.id) obj = obj.parent;
+
+                if (obj.userData.id) {
+                    if (state.tool === 'span') {
+                        handleSpanTool(obj.userData.id);
+                    } else {
+                        selectObject(obj.userData.id);
+                    }
+                }
+            } else if (state.tool === 'select') {
+                selectObject(null);
+            }
+        }
+
+        function handleSpanTool(poleId) {
+            const pole = state.poles.find(p => p.id === poleId);
+            if (!pole) return;
+
+            if (!state.spanStart) {
+                state.spanStart = poleId;
+                notify('Click second pole to complete span', 'info');
+                highlightPole(poleId, true);
+            } else {
+                if (state.spanStart !== poleId) {
+                    createSpan(state.spanStart, poleId);
+                    notify('Span created!', 'success');
+                }
+                highlightPole(state.spanStart, false);
+                state.spanStart = null;
+            }
+        }
+
+        function highlightPole(id, on) {
+            const obj = objects.get(id);
+            if (obj) {
+                obj.traverse(c => {
+                    if (c.material?.emissive) {
+                        c.material.emissive.setHex(on ? 0x00ff00 : 0x000000);
+                    }
+                });
+            }
+        }
+
+        function selectObject(id) {
+            // Clear previous selection
+            if (state.selected) {
+                const prev = objects.get(state.selected);
+                if (prev) prev.traverse(c => {
+                    if (c.material?.emissive) c.material.emissive.setHex(0x000000);
+                });
+            }
+
+            state.selected = id;
+
+            if (id) {
+                const obj = objects.get(id);
+                if (obj) obj.traverse(c => {
+                    if (c.material?.emissive) c.material.emissive.setHex(0xff6600);
+                });
+                updateProperties(id);
+            } else {
+                clearProperties();
+            }
+
+            document.getElementById('selectedName').textContent = id || 'None';
+        }
+
+        // ===== Properties Panel =====
+        function updateProperties(id) {
+            const panel = document.getElementById('propsPanel');
+            const pole = state.poles.find(p => p.id === id);
+            const span = state.spans.find(s => s.id === id);
+
+            if (pole) {
+                panel.innerHTML = `
+                    <div class="form-group">
+                        <label class="label">Pole ID</label>
+                        <input class="input" value="${pole.id}" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label class="label">X Position</label>
+                            <input class="input" type="number" value="${pole.x.toFixed(1)}" onchange="updatePole('${id}', 'x', this.value)">
+                        </div>
+                        <div>
+                            <label class="label">Z Position</label>
+                            <input class="input" type="number" value="${pole.z.toFixed(1)}" onchange="updatePole('${id}', 'z', this.value)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label class="label">Class</label>
+                            <select class="input" onchange="updatePole('${id}', 'poleClass', this.value)">
+                                ${Object.keys(POLE_CLASSES).map(c => `<option value="${c}" ${c === pole.poleClass ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Height (ft)</label>
+                            <input class="input" value="${pole.height}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Capacity (lb-ft)</label>
+                        <input class="input" value="${pole.capacity}" readonly>
+                    </div>
+                    <button class="btn danger" style="width:100%" onclick="deleteObject('${id}')">🗑️ Delete Pole</button>
+                `;
+            } else if (span) {
+                panel.innerHTML = `
+                    <div class="form-group">
+                        <label class="label">Span ID</label>
+                        <input class="input" value="${span.id}" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label class="label">From</label>
+                            <input class="input" value="${span.pole1}" readonly>
+                        </div>
+                        <div>
+                            <label class="label">To</label>
+                            <input class="input" value="${span.pole2}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Length (m)</label>
+                        <input class="input" value="${span.length.toFixed(1)}" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label class="label">Phases</label>
+                            <select class="input" onchange="updateSpan('${id}', 'phases', this.value)">
+                                <option ${span.phases === 1 ? 'selected' : ''}>1</option>
+                                <option ${span.phases === 3 ? 'selected' : ''}>3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label">Sag (m)</label>
+                            <input class="input" type="number" step="0.1" value="${span.sag}" onchange="updateSpan('${id}', 'sag', this.value)">
+                        </div>
+                    </div>
+                    <button class="btn danger" style="width:100%" onclick="deleteObject('${id}')">🗑️ Delete Span</button>
+                `;
+            }
+        }
+
+        function clearProperties() {
+            document.getElementById('propsPanel').innerHTML = `
+                <div style="color: #64748b; text-align: center; padding: 1rem;">
+                    Select a component to edit properties
+                </div>
+            `;
+        }
+
+        // ===== Analysis =====
+        function runAnalysis() {
+            if (state.poles.length === 0) {
+                notify('Add poles first!', 'error');
+                return;
+            }
+
+            let maxUtil = 0;
+            let totalLength = 0;
+            const results = [];
+
+            state.poles.forEach(pole => {
+                // Calculate loads from connected spans
+                const connectedSpans = state.spans.filter(s => s.pole1 === pole.id || s.pole2 === pole.id);
+                let moment = 0;
+
+                connectedSpans.forEach(span => {
+                    // Simplified wind load calculation
+                    const windForce = 4 * span.length * span.phases * 0.3048; // psf * ft
+                    const height = pole.height * 0.8;
+                    moment += windForce * height;
+                });
+
+                // Add pole wind load
+                moment += 4 * pole.height * 0.5 * (pole.height * 0.6);
+
+                const utilization = (moment * 2.2 / pole.capacity) * 100;
+                maxUtil = Math.max(maxUtil, utilization);
+
+                results.push({
+                    id: pole.id,
+                    poleClass: pole.poleClass,
+                    moment: moment.toFixed(0),
+                    capacity: pole.capacity,
+                    utilization: utilization.toFixed(1),
+                    status: utilization <= 100 ? 'PASS' : 'FAIL'
+                });
+            });
+
+            state.spans.forEach(span => {
+                totalLength += span.length * 3.28084; // m to ft
+            });
+
+            // Update quick analysis
+            document.getElementById('totalLength').textContent = `${totalLength.toFixed(0)} ft`;
+            document.getElementById('maxUtil').textContent = `${maxUtil.toFixed(1)}%`;
+            document.getElementById('maxUtil').className = `result-value ${maxUtil <= 100 ? 'pass' : 'fail'}`;
+            document.getElementById('clearanceStatus').textContent = maxUtil <= 100 ? 'PASS' : 'FAIL';
+            document.getElementById('clearanceStatus').className = `result-value ${maxUtil <= 100 ? 'pass' : 'fail'}`;
+
+            // Show modal
+            const modal = document.getElementById('analysisModal');
+            document.getElementById('analysisResults').innerHTML = results.map(r => `
+                <div class="result-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span><strong>${r.id}</strong> (Class ${r.poleClass})</span>
+                        <span class="result-value ${r.status === 'PASS' ? 'pass' : 'fail'}">${r.status}</span>
+                    </div>
+                    <div style="font-size:0.8rem;color:#94a3b8;margin-top:0.5rem;">
+                        Moment: ${r.moment} / ${r.capacity} lb-ft | Utilization: ${r.utilization}%
+                    </div>
+                </div>
+            `).join('');
+
+            modal.style.display = 'flex';
+            notify('Analysis complete!', 'success');
+        }
+
+        // ===== UI Helpers =====
+        function updateUI() {
+            document.getElementById('poleCount').textContent = state.poles.length;
+            document.getElementById('spanCount').textContent = state.spans.length;
+            updateJSON();
+        }
+
+        function updateJSON() {
+            const project = {
+                version: '1.0',
+                poles: state.poles,
+                spans: state.spans,
+                settings: { view3d: state.view3d }
+            };
+            document.getElementById('jsonOutput').textContent = JSON.stringify(project, null, 2);
+        }
+
+        function notify(msg, type = 'info') {
+            const el = document.createElement('div');
+            el.className = `notification ${type}`;
+            el.textContent = msg;
+            document.body.appendChild(el);
+            setTimeout(() => el.classList.add('show'), 100);
+            setTimeout(() => {
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        }
+
+        // ===== Expose to window =====
+        window.toggleCategory = (el) => el.nextElementSibling.classList.toggle('collapsed');
+        window.setTool = (tool) => {
+            state.tool = tool;
+            document.getElementById('currentTool').textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
+            document.querySelectorAll('.toolbar .btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tool + 'Btn')?.classList.add('active');
+            if (state.spanStart) {
+                highlightPole(state.spanStart, false);
+                state.spanStart = null;
+            }
+        };
+        window.toggleView = () => { state.view3d = !state.view3d; notify(`${state.view3d ? '3D' : '2D'} view`, 'info'); };
+        window.zoomIn = () => { camera.position.multiplyScalar(0.9); };
+        window.zoomOut = () => { camera.position.multiplyScalar(1.1); };
+        window.resetView = () => { camera.position.set(150, 80, 150); controls.target.set(0, 15, 0); };
+        window.runAnalysis = runAnalysis;
+        window.showReport = () => runAnalysis();
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.saveProject = () => { localStorage.setItem('pla-project', JSON.stringify({ poles: state.poles, spans: state.spans })); notify('Saved!', 'success'); };
+        window.loadProject = () => {
+            const data = localStorage.getItem('pla-project');
+            if (data) {
+                const project = JSON.parse(data);
+                // Clear and rebuild
+                objects.forEach((obj, id) => { scene.remove(obj); objects.delete(id); });
+                state.poles = []; state.spans = []; state.poleCounter = 0; state.spanCounter = 0;
+                project.poles.forEach(p => createPole(p.x, p.z, p.poleClass, p.material));
+                project.spans.forEach(s => createSpan(s.pole1, s.pole2, s.phases, s.sag));
+                notify('Loaded!', 'success');
+            }
+        };
+        window.exportProject = () => {
+            const data = JSON.stringify({ poles: state.poles, spans: state.spans }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'pla-project.json';
+            a.click();
+        };
+        window.copyJSON = () => {
+            navigator.clipboard.writeText(document.getElementById('jsonOutput').textContent);
+            notify('JSON copied!', 'success');
+        };
+        window.deleteObject = (id) => {
+            const obj = objects.get(id);
+            if (obj) { scene.remove(obj); objects.delete(id); }
+            state.poles = state.poles.filter(p => p.id !== id);
+            state.spans = state.spans.filter(s => s.id !== id && s.pole1 !== id && s.pole2 !== id);
+            selectObject(null);
+            updateUI();
+            notify('Deleted', 'info');
+        };
+        window.updatePole = (id, prop, val) => {
+            const pole = state.poles.find(p => p.id === id);
+            if (pole) {
+                if (prop === 'x' || prop === 'z') {
+                    pole[prop] = parseFloat(val);
+                    const obj = objects.get(id);
+                    if (obj) obj.position[prop === 'x' ? 'x' : 'z'] = parseFloat(val);
+                }
+                updateJSON();
+            }
+        };
+        window.POLE_CLASSES = POLE_CLASSES;
+
+        // ===== Drag and Drop =====
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('item')) {
+                e.dataTransfer.setData('text/plain', JSON.stringify(e.target.dataset));
+            }
+        });
+
+        document.getElementById('canvas').addEventListener('dragover', (e) => e.preventDefault());
+        document.getElementById('canvas').addEventListener('drop', (e) => {
+            e.preventDefault();
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+            // Calculate 3D position from drop location
+            const rect = renderer.domElement.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 200;
+            const z = ((e.clientY - rect.top) / rect.height - 0.5) * 200;
+
+            if (data.type === 'pole') {
+                createPole(x, z, data.class, data.material);
+                notify(`Added ${data.material} pole Class ${data.class}`, 'success');
+            }
+        });
+
+        // ===== Init =====
+        initThree();
+        setTool('select');
+
+        // Demo: Add some initial poles
+        createPole(-40, 0, '2', 'wood');
+        createPole(0, 0, '2', 'wood');
+        createPole(40, 0, '2', 'wood');
+        createSpan('pole_1', 'pole_2');
+        createSpan('pole_2', 'pole_3');
+    </script>
+</body>
+</html>
