@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLA - Browser LLM</title>
+    <link rel="stylesheet" href="../assets/css/base.css">
+    <style>
+        .model-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .model-card { background: #1e293b; padding: 1rem; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .model-card:hover { border-color: #3b82f6; }
+        .model-card.active { border-color: #22c55e; background: #1a3a2a; }
+        .model-card h3 { margin: 0 0 0.5rem 0; }
+        .model-card .size { color: #60a5fa; font-size: 0.9rem; }
+        .model-card .desc { opacity: 0.7; font-size: 0.85rem; }
+        .chat { background: #1e1e1e; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        #messages { height: 300px; overflow-y: auto; margin-bottom: 1rem; }
+        .msg { padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px; }
+        .msg.user { background: #2563eb; margin-left: 20%; }
+        .msg.bot { background: #374151; margin-right: 20%; }
+        .input-row { display: flex; gap: 0.5rem; }
+        .input-row input { flex: 1; padding: 0.75rem; border: 0; border-radius: 4px; background: #374151; color: #fff; }
+        .progress { background: #333; border-radius: 4px; height: 8px; margin: 0.5rem 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #22c55e); transition: width 0.3s; }
+        #status { padding: 0.5rem; background: #333; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <nav class="topnav">
+        <a href="../../" class="logo">🔌 PLA</a>
+        <div class="nav-links">
+            <a href="../">App</a>
+            <a href="../core/">Core</a>
+            <a href="../viz/">Viz</a>
+            <a href="../analysis/">Analysis</a>
+            <a href="./">LLM</a>
+            <a href="../sandbox/">Sandbox</a>
+        </div>
+    </nav>
+    <main>
+        <h1>Browser LLM</h1>
+        <p>Run AI models entirely in your browser. Models are cached after first download.</p>
+
+        <h2>Select Model</h2>
+        <div class="model-cards">
+            <div class="model-card" data-model="distilgpt2" onclick="selectModel('distilgpt2')">
+                <h3>DistilGPT2</h3>
+                <div class="size">~80MB</div>
+                <div class="desc">Text generation</div>
+            </div>
+            <div class="model-card" data-model="t5small" onclick="selectModel('t5small')">
+                <h3>Flan-T5 Small</h3>
+                <div class="size">~77MB</div>
+                <div class="desc">Instruction following</div>
+            </div>
+            <div class="model-card active" data-model="minilm" onclick="selectModel('minilm')">
+                <h3>MiniLM-L6</h3>
+                <div class="size">~23MB</div>
+                <div class="desc">Embeddings + PLA Q&A</div>
+            </div>
+        </div>
+
+        <div id="status">Select a model and click Load</div>
+        <div class="progress"><div class="progress-bar" id="progress" style="width: 0%"></div></div>
+        <button class="btn" id="loadBtn" onclick="loadModel()">Load Model</button>
+
+        <h2>Chat</h2>
+        <div class="chat">
+            <div id="messages"></div>
+            <div class="input-row">
+                <input type="text" id="input" placeholder="Ask about pole line analysis..." disabled>
+                <button class="btn" id="sendBtn" onclick="send()" disabled>Send</button>
+            </div>
+        </div>
+
+        <h2>Similarity Demo</h2>
+        <div class="card">
+            <p>Compare semantic similarity between two texts (requires MiniLM):</p>
+            <input type="text" id="sim1" value="Calculate the sag of a 50m span" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
+            <input type="text" id="sim2" value="What is the catenary tension?" style="width:100%; margin:0.5rem 0; padding:0.5rem;">
+            <button class="btn" onclick="compareSim()">Compare</button>
+            <div id="simResult" style="margin-top:0.5rem; font-family:monospace;"></div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initLLM, generate, similarity, PLAAssistant, MODELS } from '../core/transformers-llm.js';
+
+        let selectedModel = 'minilm';
+        let loaded = false;
+        let assistant = null;
+
+        window.selectModel = (key) => {
+            selectedModel = key;
+            document.querySelectorAll('.model-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-model="${key}"]`).classList.add('active');
+            loaded = false;
+            document.getElementById('status').textContent = `Selected: ${MODELS[key].id}`;
+            document.getElementById('input').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+        };
+
+        window.loadModel = async () => {
+            const btn = document.getElementById('loadBtn');
+            const status = document.getElementById('status');
+            const progress = document.getElementById('progress');
+
+            btn.disabled = true;
+            status.textContent = `Loading ${MODELS[selectedModel].id}...`;
+
+            try {
+                await initLLM(selectedModel, (p) => {
+                    if (p.status === 'progress') {
+                        const pct = Math.round((p.loaded / p.total) * 100);
+                        progress.style.width = `${pct}%`;
+                        status.textContent = `Downloading: ${pct}% (${(p.loaded/1e6).toFixed(1)}MB)`;
+                    }
+                });
+
+                if (selectedModel === 'minilm') {
+                    assistant = new PLAAssistant();
+                    await assistant.init();
+                }
+
+                progress.style.width = '100%';
+                status.textContent = `Ready! Model cached in browser.`;
+                document.getElementById('input').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                loaded = true;
+            } catch (e) {
+                status.textContent = `Error: ${e.message}`;
+            }
+            btn.disabled = false;
+        };
+
+        window.send = async () => {
+            const input = document.getElementById('input');
+            const messages = document.getElementById('messages');
+            const text = input.value.trim();
+            if (!text || !loaded) return;
+
+            messages.innerHTML += `<div class="msg user">${text}</div>`;
+            input.value = '';
+
+            let response;
+            if (selectedModel === 'minilm' && assistant) {
+                response = await assistant.ask(text);
+            } else if (selectedModel === 't5small') {
+                response = await generate(text, { max_new_tokens: 100 });
+            } else {
+                response = await generate(text, { max_new_tokens: 50 });
+                response = response.replace(text, '').trim();
+            }
+
+            messages.innerHTML += `<div class="msg bot">${response}</div>`;
+            messages.scrollTop = messages.scrollHeight;
+        };
+
+        window.compareSim = async () => {
+            if (selectedModel !== 'minilm' || !loaded) {
+                document.getElementById('simResult').textContent = 'Load MiniLM model first';
+                return;
+            }
+            const t1 = document.getElementById('sim1').value;
+            const t2 = document.getElementById('sim2').value;
+            const sim = await similarity(t1, t2);
+            document.getElementById('simResult').textContent = `Similarity: ${(sim * 100).toFixed(1)}%`;
+        };
+
+        document.getElementById('input').addEventListener('keypress', e => {
+            if (e.key === 'Enter') window.send();
+        });
+    </script>
+</body>
+</html>
