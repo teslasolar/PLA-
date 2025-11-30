@@ -1,6 +1,7 @@
 /**
- * PLA Designer - Main Entry (Enhanced v3.0)
+ * PLA Designer - Main Entry (Enhanced v4.0)
  * Features: 3D, Undo/Redo, Map, Sag-Tension, Loading, Equipment, Clearance, GIS, BOM, Templates, Themes
+ *           + Engineering Calculators, Terrain, Inspections, Progress Tracking, Dashboard
  */
 import * as THREE from 'three';
 import { initScene, camera, renderer, objects, zoomIn, zoomOut, resetCamera, addObject } from './scene.js';
@@ -18,7 +19,7 @@ import { showSagTensionModal } from './sag-tension.js';
 import { buildLoadingSelector, initLoading, getGrade } from './loading.js';
 import { addEquipmentToPole } from './equipment.js';
 
-// New feature imports
+// Feature imports - v3.0
 import { checkAllClearances, generateClearanceReport, showClearanceDialog } from './clearance.js';
 import { createLoadingDiagram, showLoadingDiagram, getPoleMoment } from './loading-diagram.js';
 import { calculateGuy, showGuyingCalculator, generateGuyingReport } from './guying-calc.js';
@@ -37,6 +38,17 @@ import { initTouchGestures, resetTransform, screenToCanvas, canvasToScreen } fro
 import { initVersionHistory, saveVersion, loadVersion, getVersions, showVersionsDialog, compareVersions } from './versions.js';
 import { initAnnotations, setAnnotationTool, clearAnnotationTool, showAnnotationTools, getAnnotations, clearAllAnnotations } from './annotations.js';
 import { initComments, addComment, getComments, showCommentsPanel, updateCommentBadges } from './comments.js';
+
+// Feature imports - v4.0 Engineering Calculators
+import { calculateVoltageDrop, calculateLineVoltageDrop, generateVoltageDropTable, showVoltageDropCalculator } from './voltage-drop.js';
+import { calculateTransformerSize, generateSizingReport, showTransformerSizingDialog } from './transformer-sizing.js';
+import { calculateFaultCurrent, analyzeLineFaults, generateFaultReport, showFaultAnalysisDialog } from './fault-current.js';
+import { calculateRulingSpan, analyzeSpans, generateRulingSpanReport, showRulingSpanDialog } from './ruling-span.js';
+import { initTerrain, importTerrainFromFile, generateRandomTerrain, getElevationAt, showTerrainDialog } from './terrain.js';
+import { initObstacles, addObstacle, analyzeAllObstacles, showObstaclesDialog } from './obstacles.js';
+import { initInspections, createInspection, getInspectionSummary, showInspectionDialog } from './inspection.js';
+import { initProgress, setProgress, calculateOverallProgress, showProgressDialog } from './progress.js';
+import { initDashboard, getDashboardData, showDashboard } from './dashboard.js';
 
 let params = null;
 const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
@@ -65,13 +77,20 @@ async function init() {
     initHistory();
     initShortcuts();
 
-    // Init new features
+    // Init v3.0 features
     initTheme();
     initVersionHistory();
     initAnnotations();
     initComments();
     initTouchGestures(document.getElementById('canvas'));
     initWindAnimation(window.scene);
+
+    // Init v4.0 features
+    initTerrain();
+    initObstacles();
+    initInspections();
+    initProgress();
+    initDashboard();
 
     setupEvents();
 
@@ -83,8 +102,8 @@ async function init() {
     addSpanToScene('pole_2', 'pole_3');
 
     saveState('init');
-    console.log('✅ Ready - 18 feature modules loaded');
-    notify('Designer v3.0 ready! Press ? for shortcuts', 'success');
+    console.log('✅ Ready - 27 feature modules loaded');
+    notify('Designer v4.0 ready! Press ? for shortcuts', 'success');
 }
 
 function setupEvents() {
@@ -232,6 +251,21 @@ window.showThemes = showThemeSelector;
 window.showVersions = showVersionsDialog;
 window.showAnnotations = showAnnotationTools;
 window.showComments = (id) => showCommentsPanel(id, id ? 'pole' : null);
+
+// Window exports - v4.0 Engineering Calculators
+window.showVoltageDropCalculator = showVoltageDropCalculator;
+window.showTransformerSizing = showTransformerSizingDialog;
+window.showFaultAnalysis = showFaultAnalysisDialog;
+window.showRulingSpanDialog = showRulingSpanDialog;
+window.showTerrainDialog = showTerrainDialog;
+window.showObstaclesDialog = showObstaclesDialog;
+window.showInspectionDialog = showInspectionDialog;
+window.showProgressDialog = showProgressDialog;
+window.showDashboard = showDashboard;
+window.calcVoltageDrop = calculateVoltageDrop;
+window.calcFaultCurrent = calculateFaultCurrent;
+window.calcRulingSpan = calculateRulingSpan;
+window.getElevationAt = getElevationAt;
 
 // Window exports - Direct actions
 window.toggleTheme = toggleTheme;

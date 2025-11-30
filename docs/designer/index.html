@@ -49,6 +49,8 @@
                 <button class="btn" onclick="window.showSagModal?.()">Sag</button>
                 <button class="btn" onclick="showReport()">Report</button>
                 <button class="btn" onclick="window.generatePDF?.()" title="Export PDF">PDF</button>
+                <div class="toolbar-separator"></div>
+                <button class="btn" onclick="window.showDashboard?.()" title="Dashboard">Dashboard</button>
                 <div style="flex:1"></div>
                 <button class="btn" onclick="window.showShortcuts?.()" title="Keyboard Shortcuts (?)">?</button>
                 <button class="btn success" onclick="saveProject()">Save</button>
@@ -144,6 +146,105 @@
             <div id="shortcutsList" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"></div>
             <div style="margin-top: 1rem; text-align: right;">
                 <button class="btn" onclick="closeModal('shortcutsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="modal" id="dashboardModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">📊 Project Dashboard</div>
+            <div id="dashboardContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('dashboardModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voltage Drop Modal -->
+    <div class="modal" id="voltageDropModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">⚡ Voltage Drop Calculator</div>
+            <div id="voltageDropContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('voltageDropModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transformer Sizing Modal -->
+    <div class="modal" id="transformerModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">🔌 Transformer Sizing</div>
+            <div id="transformerContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('transformerModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fault Current Modal -->
+    <div class="modal" id="faultModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">💥 Fault Current Analysis</div>
+            <div id="faultContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('faultModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ruling Span Modal -->
+    <div class="modal" id="rulingSpanModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">📏 Ruling Span Calculator</div>
+            <div id="rulingSpanContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('rulingSpanModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terrain Modal -->
+    <div class="modal" id="terrainModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-title">🏔️ Terrain / Elevation</div>
+            <div id="terrainContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('terrainModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Obstacles Modal -->
+    <div class="modal" id="obstaclesModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">🌳 Obstacles & Obstructions</div>
+            <div id="obstaclesContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('obstaclesModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inspection Modal -->
+    <div class="modal" id="inspectionModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">🔍 Pole Inspections</div>
+            <div id="inspectionContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('inspectionModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-title">📈 Construction Progress</div>
+            <div id="progressContent"></div>
+            <div style="margin-top: 1rem; text-align: right;">
+                <button class="btn" onclick="closeModal('progressModal')">Close</button>
             </div>
         </div>
     </div>

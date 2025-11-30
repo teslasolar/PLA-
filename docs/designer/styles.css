@@ -105,3 +105,96 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 
 /* Disabled button */
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Dashboard Styles */
+.dashboard{padding:.5rem}
+.dash-section{background:rgba(0,0,0,.2);border-radius:8px;padding:1rem;margin-bottom:1rem}
+.dash-section.hero{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(16,185,129,.1))}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.75rem}
+.dash-card{background:rgba(255,255,255,.05);border-radius:6px;padding:1rem;text-align:center}
+.dash-card.primary{background:linear-gradient(135deg,var(--acc2),#1d4ed8)}
+.dash-val{display:block;font-size:1.8rem;font-weight:700;color:var(--txt)}
+.dash-label{font-size:.7rem;color:var(--txt2)}
+.dash-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.dash-stats{display:flex;flex-direction:column;gap:.5rem}
+.stat-item{display:flex;justify-content:space-between;padding:.4rem .6rem;background:rgba(0,0,0,.2);border-radius:4px}
+.stat-name{color:var(--txt2);font-size:.75rem}
+.stat-value{color:var(--txt);font-weight:600;font-size:.85rem}
+.progress-bar-container{background:rgba(0,0,0,.3);border-radius:10px;height:20px;position:relative;overflow:hidden}
+.progress-bar-fill{background:linear-gradient(90deg,var(--ok),#059669);height:100%;transition:width .3s}
+.progress-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600}
+.progress-details{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.7rem;color:var(--txt2)}
+.equipment-list{display:flex;flex-direction:column;gap:.3rem}
+.equip-item{display:flex;justify-content:space-between;padding:.3rem .5rem;background:rgba(0,0,0,.2);border-radius:4px;font-size:.75rem}
+.action-buttons{display:flex;flex-wrap:wrap;gap:.5rem}
+.warnings .warning-item{background:rgba(245,158,11,.15);border-left:3px solid var(--warn);padding:.5rem;margin-bottom:.5rem;border-radius:4px;font-size:.8rem}
+
+/* Progress Tracking */
+.progress-overview{display:flex;gap:2rem;align-items:center;justify-content:center;padding:1rem 0}
+.overall-progress{text-align:center}
+.progress-circle{width:100px;height:100px;background:conic-gradient(var(--ok) calc(var(--percent)*1%),rgba(0,0,0,.3) 0);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+.progress-circle::before{content:'';position:absolute;width:75px;height:75px;background:var(--bg2);border-radius:50%}
+.progress-val{font-size:1.4rem;font-weight:700;z-index:1}
+.progress-label{display:block;margin-top:.5rem;font-size:.75rem;color:var(--txt2)}
+.stage-breakdown{display:flex;flex-direction:column;gap:.4rem}
+.stage-row{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:rgba(0,0,0,.15);border-radius:4px;font-size:.75rem}
+.stage-row.active{background:rgba(16,185,129,.15)}
+.stage-icon{width:24px;text-align:center}
+.stage-name{flex:1;color:var(--txt2)}
+.stage-count{background:var(--bg3);padding:.1rem .4rem;border-radius:8px;min-width:24px;text-align:center}
+
+/* Inspection Styles */
+.insp-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem}
+.rating-breakdown{margin-top:1rem}
+.rating-bars{display:flex;flex-direction:column;gap:.4rem}
+.rating-row{display:flex;align-items:center;gap:.5rem;font-size:.75rem}
+.rating-label{width:60px}
+.rating-bar-bg{flex:1;height:16px;background:rgba(0,0,0,.3);border-radius:8px;overflow:hidden}
+.rating-bar{height:100%;transition:width .3s}
+.rating-count{width:30px;text-align:right}
+.insp-category{margin-bottom:1rem}
+.insp-category h5{margin-bottom:.5rem;color:var(--acc)}
+.insp-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+
+/* Obstacle Styles */
+.obs-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+.obs-types{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.obs-type-badge{background:rgba(0,0,0,.2);padding:.3rem .6rem;border-radius:12px;font-size:.75rem}
+.add-obs-form{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.add-obs-form .input{width:auto;flex:1;min-width:80px}
+
+/* Engineering Calculator Styles */
+.result-card{background:rgba(0,0,0,.2);border-radius:6px;padding:1rem;margin-bottom:.5rem}
+.result-card.pass{border-left:3px solid var(--ok)}
+.result-card.warning,.result-card.warn{border-left:3px solid var(--warn)}
+.result-card.fail{border-left:3px solid var(--err)}
+.result-header{display:flex;justify-content:space-between;margin-bottom:.75rem}
+.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;font-size:.8rem}
+.status-badge{padding:.2rem .6rem;border-radius:12px;font-size:.7rem;font-weight:600}
+.status-badge.pass{background:rgba(16,185,129,.2);color:var(--ok)}
+.status-badge.warning{background:rgba(245,158,11,.2);color:var(--warn)}
+.status-badge.fail{background:rgba(239,68,68,.2);color:var(--err)}
+.recommendation{margin-top:.75rem;padding:.5rem;background:rgba(0,0,0,.2);border-radius:4px;font-size:.8rem}
+.calc-form{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+.form-row{display:flex;flex-direction:column;gap:.25rem}
+.form-row label{font-size:.7rem;color:var(--txt2)}
+
+/* Terrain Styles */
+.terrain-dialog{}
+.terrain-actions{display:flex;gap:.5rem;margin-bottom:1rem}
+.terrain-info{margin-bottom:1rem}
+.terrain-settings{margin-top:1rem}
+
+/* Ruling Span Styles */
+.rs-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem}
+.rs-warnings{background:rgba(245,158,11,.1);border-radius:6px;padding:.75rem;margin-bottom:1rem}
+.rs-formula{background:rgba(0,0,0,.2);padding:.75rem;border-radius:6px;font-size:.8rem;margin-top:1rem}
+.rs-formula code{background:rgba(0,0,0,.3);padding:.2rem .5rem;border-radius:4px;font-family:monospace}
+
+/* Sizing Options */
+.size-options{display:flex;flex-wrap:wrap;gap:.5rem}
+.size-option{background:rgba(0,0,0,.2);padding:.5rem .75rem;border-radius:6px;text-align:center}
+.size-option.selected{background:rgba(59,130,246,.3);border:1px solid var(--acc)}
+.size-option.overload{background:rgba(239,68,68,.2)}
+.size-val{display:block;font-weight:600}
+.size-loading{font-size:.7rem;color:var(--txt2)}
