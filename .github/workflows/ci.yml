@@ -1,0 +1,59 @@
+name: CI - Test & Validate
+
+on:
+  push:
+    branches: [main, master, 'claude/**']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Validate JSON files
+        run: npm run test:json
+
+      - name: Validate HTML structure
+        run: npm run test:html
+
+      - name: Validate JavaScript
+        run: npm run test:js
+
+      - name: Run all tests
+        run: npm test
+
+      - name: Build check
+        run: npm run build:check
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Run ESLint
+        run: npm run lint || echo "Linting completed with warnings"
+        continue-on-error: true

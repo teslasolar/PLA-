@@ -1,0 +1,24 @@
+{
+  "name": "pla-pole-line-analysis",
+  "version": "1.0.0",
+  "description": "Pole Line Analysis System - 3D Engineering for GitHub Pages",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:json": "node tests/validate-json.js",
+    "test:html": "node tests/validate-html.js",
+    "test:js": "node tests/validate-js.js",
+    "lint": "eslint docs/**/*.js --ignore-pattern 'docs/sandbox/pyodide/**'",
+    "serve": "npx serve . -p 8080",
+    "build:check": "node tests/build-check.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "keywords": ["pole-line", "utility", "engineering", "3d", "webgpu", "threejs"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/teslasolar/PLA-.git"
+  }
+}

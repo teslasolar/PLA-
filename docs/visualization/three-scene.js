@@ -2,6 +2,8 @@
  * 🎨 Three.js Scene Manager for PLA Visualization
  * 3D rendering of poles, conductors, and infrastructure
  */
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 class PLAScene {
     constructor(container) {
